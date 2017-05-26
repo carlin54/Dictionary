@@ -1,0 +1,29 @@
+name: Dictionary
+version: 0.0.1
+cabal-version: 1.12
+build-type: Simple
+license: AllRightsReserved
+license-file: ""
+description:
+data-dir: ""
+
+executable Dictionary
+    build-depends: QuickCheck -any,
+                   base -any,
+                   doctest -any,
+                   http-conduit
+    main-is: Main.hs
+    buildable: True
+    default-language: Haskell2010
+    hs-source-dirs: src
+    ghc-options: -ferror-spans
+
+test-suite test-Dictionary
+    build-depends: QuickCheck -any, base -any, doctest -any
+    type: exitcode-stdio-1.0
+    main-is: Main.hs
+    buildable: True
+    default-language: Haskell2010
+    hs-source-dirs: test
+    ghc-options: -ferror-spans
+
