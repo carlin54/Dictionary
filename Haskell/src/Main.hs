@@ -28,6 +28,7 @@ import Network.HTTP.Conduit
 -- -- Part Of Speech |ID| ? Dynamic Sizing
 -- -- Referece |ID|ID| assumed |ID|
    -- -- |Word ID|Sub Number|
+
 -- Word
 -- -- ID
 -- -- String
@@ -153,6 +154,40 @@ data VerbTenses = Tenses {
     futureContinuous            :: String,
     futurePerfectContinuous     :: String
 }
+
+data Noun           = Noun
+data Pronoun        = Pronoun
+data Verb           = Verb
+data Adjective      = Adjective
+data Adverb         = Adverb
+data Preposition    = Preposition
+data Conjunction    = Conjunction
+data Exclamation    = Exclamation
+data Word = Word {
+    id :: Int,
+    word :: String,
+    nouns :: [Noun],
+    pronouns :: [Pronoun],
+    verbs :: [Verb],
+    adjectives :: [Adjective],
+    adverbs :: [Adverb],
+    presuppositions :: [Preposition],
+    conjunctions :: [Conjunction],
+    exclamations :: [Exclamation]
+}
+
+class PartOfSpeech p where
+    partOfSpeech :: p -> String
+    id :: p -> Int
+    definition :: p -> BroadDefinition
+
+
+-- data Noun = Noun Int String BroadDefinition
+-- instance PartOfSpeech Noun where
+--     partOfSpeech (Noun id plural broadDefinition) = "Noun"
+--     id (Noun id plural broadDefinition) = id
+--     definition (Noun id plural broadDefinition) = broadDefinition
+
 
 main :: IO ()
 main = putStrLn "Hello, World!"
