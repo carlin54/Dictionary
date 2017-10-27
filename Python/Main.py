@@ -33,7 +33,7 @@ class FindObject:
 
 ## Definitions ##
 def createDefinitionFindObject(regex_section_object):
-    regex_find_each_definition = r"<div class=\"def-set\">.+?</div>"
+    regex_find_each_definition = r"<div class=\"def-set\">.+?</div>.[\n ]*</div>"
 
     regex_clip_new_line = r"\n"
     regex_clip_carriage_return = r"\r"
@@ -99,6 +99,7 @@ class Meaning:
     def _init__(self, defintion, example):
         self.definition = defintion
         self.example = example
+
 def cut(regex, text):
     return []
 
@@ -113,7 +114,8 @@ def form_meaning(definition):
 
 
     # The Sublist [Definition, +? Example]
-    subListObject = FindObject(['<ol class="def-sub-list">.*</ol>','<li>.+?</li>'],[])
+    print(definition)
+    subListObject = FindObject(['<ol class="def-sub-list">.+?</ol>','<li>.+?</li>'],[])
     subList = capture(definition, subListObject)
     if(len(subList) != 0):
         print("SUBLIST------")
@@ -171,6 +173,11 @@ def form_word(root, definitions):
     ## Exclamation ##
 	
 	## Idioms ##
+    print("-----Idioms-----")
+    regex_find_idioms_UWO_section = "<span class=\"dbox-pg\">Idioms</span>.+?</section>"
+    findObjectIdioms = createDefinitionFindObject(regex_find_idioms_UWO_section)
+    idioms = capture(definitions, findObjectIdioms);
+    print(idioms)
 
 ##CUT ([FIND], [CLIP, REPLACE])
 def lookup_word(word):
