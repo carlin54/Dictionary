@@ -18,23 +18,22 @@ class PartOfSpeech:
 
 class Word:
     root = ''
-    definitions = []
+    primary_definition = []
+    secondary_definition = []
 
 class Definition:
     partOfSpeech = 0
-    meaning = []
-
-class FindObject:
-    find = []
-    clip = []
-    def __init__(self, find, clip):
-        self.find = find;
-        self.clip = clip;
+    description = ''
+    example = ''
 
 ## Definitions ##
-def createDefinitionFindObject(regex_section_object):
+def find_definition(regex_section):
     regex_find_each_definition = r"<div class=\"def-set\">.+?</div>.[\n ]*</div>"
+    find = [regex_section,
+            regex_find_each_definition]
+    return find
 
+def clip_definition():
     regex_clip_new_line = r"\n"
     regex_clip_carriage_return = r"\r"
     regex_clip_l1 = r"<div.*number\">"
@@ -42,15 +41,12 @@ def createDefinitionFindObject(regex_section_object):
     regex_clip_l3 = r"[ ]*</div>"
     regex_clip_href_a = r"<a class=\"dbox-xref dbox-roman\" href=\"http://www.dictionary.com/browse/[a-zA-Z]*\">"
     regex_clip_a = r"</a>"
-    ## rregex_clip_example_href = r"[ ]*<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">"
-    ## rregex_clip_example_href_span = r"</span>"
-    ## regex_clip_italic = r"<span class=\"dbox-italic\">"
-    ## rregex_clip_example = r"<span class=\"dbox-example\">"
-    ## regex_clip_bold = r"<span class=\"dbox-bold\">"
-    ## regex_clip_li = r"<li>"
-
-    find = [regex_section_object,
-            regex_find_each_definition]
+    regex_clip_example_href = r"[ ]*<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">"
+    regex_clip_example_href_span = r"</span>"
+    regex_clip_italic = r"<span class=\"dbox-italic\">"
+    regex_clip_example = r"<span class=\"dbox-example\">"
+    regex_clip_bold = r"<span class=\"dbox-bold\">"
+    regex_clip_li = r"<li>"
 
     clip = [regex_clip_new_line,
             regex_clip_carriage_return,
@@ -67,14 +63,14 @@ def createDefinitionFindObject(regex_section_object):
             regex_clip_a
     ]
 
-    return FindObject(find,[])
+    return clip
 
-def capture(text, findObject, n=0):
+def capture(text, find, clip, n=0):
     input = [text]
-    for i in range(0, len(findObject.find)):
+    for i in range(0, len(find)):
         output = []
         for j in range(0, len(input)):
-            output.extend(re.findall(findObject.find[i], input[j], re.DOTALL))
+            output.extend(re.findall(find[i], input[j], re.DOTALL))
         input = output
         if len(input) == 0:
             break;
@@ -82,9 +78,9 @@ def capture(text, findObject, n=0):
     if len(input) == 0:
         return []
 
-    for i in range(0, len(findObject.clip)):
+    for i in range(0, len(clip)):
         for j in range(0, len(input)):
-           input[j] = re.sub(findObject.clip[i], '', input[j])
+           input[j] = re.sub(clip[i], '', input[j])
 
     if n == 0:
         return input
@@ -103,23 +99,36 @@ class Meaning:
 def cut(regex, text):
     return []
 
+def form_sublist(subList):
+    print("----Processing Sublist----")
+    print(subList)
+
+
+
+def fetch_sublist(definition):
+    print("----Fetching Sublist-----")
+
+    # The Sublist [Definition, +? Example]
+
+    find = ['<span class="def-number">[0-9].']
+    clip = ['<span class="def-number">','[.]']
+    number = capture(definition, find, clip, 1)
+    number = int(number[0])
+
+    # The Sublist [Definition, +? Example]
+    print(definition)
+    find = ['<ol class="def-sub-list">.+?</ol>','<li>.+?</li>']
+    clip = []
+    subList = capture(definition, find, clip)
+    if(len(subList) != 0):
+        return []
+    else:
+        return form_sublist(subList)
 
 
 def form_meaning(definition):
 
-    # The Sublist [Definition, +? Example]
-    numberObject = FindObject(['<span class="def-number">[0-9].'], ['<span class="def-number">','[.]'])
-    number = capture(definition, numberObject, 1)
-    number = int(number[0])
 
-
-    # The Sublist [Definition, +? Example]
-    print(definition)
-    subListObject = FindObject(['<ol class="def-sub-list">.+?</ol>','<li>.+?</li>'],[])
-    subList = capture(definition, subListObject)
-    if(len(subList) != 0):
-        print("SUBLIST------")
-        print(subList)
 
     #re.match('<ol class="def-sub-list">.*</ol>')
     #re.match('<li>.+?</li>')
@@ -137,28 +146,26 @@ def form_definition(definitions):
     for i in range(0, len(definitions)):
         meaning.extend(form_meaning(definitions[i]))
 
-
 def form_word(root, definitions):
     print("-----Noun Parts-----")
-    regex_find_noun_section = "<span class=\"dbox-pg\">noun</span>.+?</header>.+?</section>"
-    findObjectNoun = createDefinitionFindObject(regex_find_noun_section)
-    noun_section = capture(definitions, findObjectNoun)
+    find = find_definition("<span class=\"dbox-pg\">noun</span>.+?</header>.+?</section>")
+    clip = clip_definition();
+    noun_section = capture(definitions, find, clip)
     x = form_definition(noun_section)
 
-    x = [PartOfSpeech.Noun, capture(definitions, findObjectNoun)]
     print(noun_section)
 
     print("-----Verbs (used without object) Parts-----")
-    regex_find_verb_UWOO_section = "<span class=\"dbox-pg\">verb.+?.used without object.</span>.+?</section>"
-    findObjectVerb_UWOO = createDefinitionFindObject(regex_find_verb_UWOO_section)
-    verb_UWOO = capture(definitions, findObjectVerb_UWOO)
-    print(verb_UWOO)
+    #regex_find_verb_UWOO_section = "<span class=\"dbox-pg\">verb.+?.used without object.</span>.+?</section>"
+    #findObjectVerb_UWOO = createDefinitionFindObject(regex_find_verb_UWOO_section)
+    #verb_UWOO = capture(definitions, findObjectVerb_UWOO)
+    #print(verb_UWOO)
 
     print("-----Verbs (used with object) Parts-----")
-    regex_find_verb_UWO_section = "<span class=\"dbox-pg\">verb .used without object.</span>.+?</section>"
-    findObjectVerb_UWO = createDefinitionFindObject(regex_find_verb_UWO_section)
-    verb_UWO = capture(definitions, findObjectVerb_UWO);
-    print(verb_UWO)
+    #regex_find_verb_UWO_section = "<span class=\"dbox-pg\">verb .used without object.</span>.+?</section>"
+    #findObjectVerb_UWO = createDefinitionFindObject(regex_find_verb_UWO_section)
+    #verb_UWO = capture(definitions, findObjectVerb_UWO);
+    #print(verb_UWO)
 
     ## Adjective ##
 
@@ -172,12 +179,6 @@ def form_word(root, definitions):
 
     ## Exclamation ##
 	
-	## Idioms ##
-    print("-----Idioms-----")
-    regex_find_idioms_UWO_section = "<span class=\"dbox-pg\">Idioms</span>.+?</section>"
-    findObjectIdioms = createDefinitionFindObject(regex_find_idioms_UWO_section)
-    idioms = capture(definitions, findObjectIdioms);
-    print(idioms)
 
 ##CUT ([FIND], [CLIP, REPLACE])
 def lookup_word(word):
@@ -188,26 +189,25 @@ def lookup_word(word):
 
 
     print("-----Title-----");
-    title_pattern = "Define [a-zA-Z]* at Dictionary.com</title>";
-    title_find = [title_pattern];
-    title_clip = ["Define ", " at Dictionary.com</title>"];
-    findObjectTitle = FindObject(title_find, title_clip);
-    title = capture(html, findObjectTitle)[0]
+    pattern = "Define [a-zA-Z]* at Dictionary.com</title>";
+    find = [pattern];
+    clip = ["Define ", " at Dictionary.com</title>"];
+    title = capture(html, find, clip)[0]
     print(title)
 
     print("-----Forming Word-----");
-    regex_find_definitions = r"<div class=\"deep-link-synonyms\">.+?<div class=\"tail-wrapper\">.+?<div class=\"tail-box tail-type-origin pm-btn-spot\" data-pm-btn-target=\".tail-content\" >"
-    findObjectDefinition = FindObject([regex_find_definitions],[])
-    definitions = capture(html, findObjectDefinition, 1)
+    find = ["<div class=\"deep-link-synonyms\">.+?<div class=\"tail-wrapper\">.+?<div class=\"tail-box tail-type-origin pm-btn-spot\" data-pm-btn-target=\".tail-content\" >"]
+    clip = []
+    definitions = capture(html, find, clip, 1)
     print(definitions)
     word = form_word(title, definitions[0])
 
     print("-----Accociated Words-----")
-    find_href = "href=\"http://www.dictionary.com/browse/[a-zA-Z]*"
-    clip_href = "href=\"http://www.dictionary.com/browse/"
-    findObjectAccociatedWords = FindObject([find_href], [clip_href]);
-    accociatedWords = set(capture(html, findObjectAccociatedWords));
+    find = "href=\"http://www.dictionary.com/browse/[a-zA-Z]*"
+    clip = "href=\"http://www.dictionary.com/browse/"
+    accociatedWords = set(capture(html, find, clip));
     print(accociatedWords)
 
 
 lookup_word("board")
+
