@@ -14,17 +14,56 @@ class PartOfSpeech:
     Conjunction = 6
     Determiner = 7
     Exclamation = 9
-    Idioms = 10
 
-class Word:
-    root = ''
-    primary_definition = []
-    secondary_definition = []
+class Description:
+    context = ''
+    example = ''
 
 class Definition:
-    partOfSpeech = 0
-    description = ''
-    example = ''
+    number = 1                      # :: Integer
+    mainDescription = []            # :: Description
+    additionalDescriptions = []     # :: [Description]
+
+    def __init__(self, number=0, mainDescription=[], additionalDescriptions=[]):
+        self.number = number
+        self.mainDescription = mainDescription
+        self.additionalDescriptions = additionalDescriptions
+
+    def setMainDescription(self, mainDescription):
+        self.mainDescription = mainDescription
+
+    def setAdditionalDescription(self, additionalDescriptions):
+        self.additionalDescriptions = additionalDescriptions
+
+
+class Section:
+    partOfSpeech = ''           # :: Part of Speech
+    definitions = []            # :: [Definition]
+
+    def __init__(self, pos, definitions):
+        self.partOfSpeech = pos
+        self.definitions = definitions
+
+    def setPartOfSpeech(self, pos):
+        self.partOfSpeech = pos
+
+    def setDefinitions(self, definitions):
+        self.definitions = definitions
+
+
+class Word:
+    word = ''                 # :: String
+    sectionDefinition = []    # :: [Definition]
+
+    def __init__(self, word):
+        self.word = word
+        self.sectionDefinition = []
+
+    def addSection(self, partofspeech, section):
+        if(section != []):
+            section = Section(partofspeech, section)
+            self.sectionDefinition.append(section)
+
 
 ## Definitions ##
 def find_definition(regex_section):
@@ -99,21 +138,22 @@ class Meaning:
 def cut(regex, text):
     return []
 
-def form_sublist(subList):
-    print("----Processing Sublist----")
-    print(subList)
+def fetchNumber(definition):
+    find = ['[0-9].']
+    clip = ['[.]']
+    number = capture(definition, find, clip, 1)
+    number = int(number[0])
+    return number
 
+def makeSublist(descriptions):
+    print("makeSublist()")
 
-
-def fetch_sublist(definition):
+def fetchAdditionalDescriptions(definition):
     print("----Fetching Sublist-----")
 
     # The Sublist [Definition, +? Example]
 
-    find = ['<span class="def-number">[0-9].']
-    clip = ['<span class="def-number">','[.]']
-    number = capture(definition, find, clip, 1)
-    number = int(number[0])
+
 
     # The Sublist [Definition, +? Example]
     print(definition)
@@ -123,10 +163,31 @@ def fetch_sublist(definition):
     if(len(subList) != 0):
         return []
     else:
-        return form_sublist(subList)
+        return makeSublist(subList)
 
 
-def form_meaning(definition):
+def fetchMainDescription(definition):
+    print("fetchMainDescription(definition)")
+    find = []
+    clip = ['[0-9]+[.]', '<span class=\"dbox-italic\">', '<li>.+?</ol>', '</span>', ':.+?',
+            '<div class="def-block def-inline-example"><span class="dbox-example">.+?</span>']
+    context = capture(definition, find, clip, 1)
+    find = ['<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">.+?</span>']
+    clip = ['<li>.+?</ol>', '</span>', ':.+?<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">']
+    example = capture(definition, find, clip, 1)
+    print(context)
+    print(example)
+
+def makeDefinition(description):        # :: String
+    print("makeDefinition()")
+    print(description)
+
+    number = fetchNumber(description)
+    mainDescription = fetchMainDescription(description)
+    #additionDescription = fetchAdditionalDescriptions(description)
+
+    return []
+
 
 
 
@@ -141,46 +202,57 @@ def form_meaning(definition):
 
     return definition
 
-def form_definition(definitions):
-    meaning = []
-    for i in range(0, len(definitions)):
-        meaning.extend(form_meaning(definitions[i]))
+def makeDefinitions(dirtyDefinitions): # :: [String]
+    definitions = []              # :: [Definition]
+    for dirtyDefinition in dirtyDefinitions:
+        definitions.extend(makeDefinition(dirtyDefinition))
 
-def form_word(root, definitions):
+def makeWord(root, definitions):
+    word = Word(root)
+
     print("-----Noun Parts-----")
     find = find_definition("<span class=\"dbox-pg\">noun</span>.+?</header>.+?</section>")
     clip = clip_definition();
-    noun_section = capture(definitions, find, clip)
-    x = form_definition(noun_section)
-
-    print(noun_section)
+    dirtyDefinitions = capture(definitions, find, clip)
+    definitions = makeDefinitions(dirtyDefinitions)
+    word.addSection(PartOfSpeech.Noun, definitions)
+    print(definitions)
 
     print("-----Verbs (used without object) Parts-----")
-    #regex_find_verb_UWOO_section = "<span class=\"dbox-pg\">verb.+?.used without object.</span>.+?</section>"
-    #findObjectVerb_UWOO = createDefinitionFindObject(regex_find_verb_UWOO_section)
-    #verb_UWOO = capture(definitions, findObjectVerb_UWOO)
-    #print(verb_UWOO)
+    find = find_definition("<span class=\"dbox-pg\">verb.+?.used without object.</span>.+?</section>")
+    clip = clip_definition()
+
 
     print("-----Verbs (used with object) Parts-----")
-    #regex_find_verb_UWO_section = "<span class=\"dbox-pg\">verb .used without object.</span>.+?</section>"
-    #findObjectVerb_UWO = createDefinitionFindObject(regex_find_verb_UWO_section)
-    #verb_UWO = capture(definitions, findObjectVerb_UWO);
-    #print(verb_UWO)
+    find = find_definition("<span class=\"dbox-pg\">verb .used without object.</span>.+?</section>")
+    clip = clip_definition()
+
 
     ## Adjective ##
+    print("-----Adjective-----")
+    find = find_definition("<span class=\"dbox-pg\">adjective</span>.+?</section>")
+    clip = clip_definition()
+
 
     ## Adverb ##
+    print("-----Adverb-----")
+    find = find_definition("<span class=\"dbox-pg\">adverb</span>.+?</section>")
+    clip = clip_definition()
+
 
     ## Pronoun ##
+    print("-----Pronoun-----")
+    find = find_definition("<span class=\"dbox-pg\">pronoun</span>.+?</section>")
+    clip = clip_definition()
+
 
     ## Conjunction ##
 
     ## Determiner ##
 
     ## Exclamation ##
-	
 
-##CUT ([FIND], [CLIP, REPLACE])
+
 def lookup_word(word):
     print("Looking up:" + word);
     request_url = "http://www.dictionary.com/browse/" + word + "/";
@@ -200,7 +272,7 @@ def lookup_word(word):
     clip = []
     definitions = capture(html, find, clip, 1)
     print(definitions)
-    word = form_word(title, definitions[0])
+    word = makeWord(title, definitions[0])
 
     print("-----Accociated Words-----")
     find = "href=\"http://www.dictionary.com/browse/[a-zA-Z]*"
@@ -208,6 +280,7 @@ def lookup_word(word):
     accociatedWords = set(capture(html, find, clip));
     print(accociatedWords)
 
+    print("-----Related Forms-----")
 
 lookup_word("board")
 
