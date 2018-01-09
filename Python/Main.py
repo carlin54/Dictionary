@@ -54,9 +54,13 @@ class Section:
         self.definitions = definitions
 
 class Word:
-    word = ''                 # :: String
-    sectionDefinition = []    # :: [Definition]
-
+    word = ''                   # :: String
+    sectionDefinition = []      # :: [Definition]
+    difficultyIndex = 0         # :: Integer
+    nearbyWords =   []          # :: [String]
+    relatedForms = []           # :: [String]
+    canBeConfused = []          # :: [String]
+    origin = ''                 # :: String
     def __init__(self, word):
         self.word = word
         self.sectionDefinition = []
@@ -75,7 +79,31 @@ class Meaning:
         self.definition = definition
         self.example = example
 
-## Definitions ##
+def capture(text, find, clip, n=0):
+    input = [text]
+    for i in range(0, len(find)):
+        output = []
+        for j in range(0, len(input)):
+            output.extend(re.findall(find[i], input[j], re.DOTALL))
+        input = output
+        if len(input) == 0:
+            break;
+
+    if len(input) == 0:
+        return []
+
+    for i in range(0, len(clip)):
+        for j in range(0, len(input)):
+           input[j] = re.sub(clip[i], '', input[j])
+
+    if n == 0:
+        return input
+    else:
+        return input[0:max(n,len(input))]
+
+def cut(regex, text):
+    return []
+
 def find_definition(regex_section):
     regex_find_each_definition = r"<div class=\"def-set\">.+?</div>.[\n ]*</div>"
     find = [regex_section,
@@ -114,31 +142,6 @@ def clip_definition():
 
     return clip
 
-def capture(text, find, clip, n=0):
-    input = [text]
-    for i in range(0, len(find)):
-        output = []
-        for j in range(0, len(input)):
-            output.extend(re.findall(find[i], input[j], re.DOTALL))
-        input = output
-        if len(input) == 0:
-            break;
-
-    if len(input) == 0:
-        return []
-
-    for i in range(0, len(clip)):
-        for j in range(0, len(input)):
-           input[j] = re.sub(clip[i], '', input[j])
-
-    if n == 0:
-        return input
-    else:
-        return input[0:max(n,len(input))]
-
-def cut(regex, text):
-    return []
-
 def fetch_number(definition):
     find = ['[0-9].']
     clip = ['[.]']
@@ -159,6 +162,20 @@ def make_sublist(descriptions):
         subList.append(description)
     return subList
 
+def make_definition(dirty_definition):        # :: String
+    number = fetch_number(dirty_definition)
+    main_description = fetch_main_description(dirty_definition)
+    addition_description = fetch_additional_descriptions(dirty_definition)
+
+    definition = Definition(number, main_description, addition_description)
+
+    return definition
+
+def make_definitions(dirty_definitions):    # :: [String]
+    definitions = []                        # :: [Definition]
+    for dirty_definition in dirty_definitions:
+        definitions.append(make_definition(dirty_definition))
+
 def fetch_additional_descriptions(definition):
     find = ['<li>.+?</li>']
     clip = []
@@ -177,33 +194,34 @@ def fetch_main_description(dirty_definition):
     example = capture(dirty_definition, find, clip, 1)
     return Description(context, example)
 
-def make_definition(dirty_definition):        # :: String
-    number = fetch_number(dirty_definition)
-    main_description = fetch_main_description(dirty_definition)
-    addition_description = fetch_additional_descriptions(dirty_definition)
+def fetch_root(html):
+    print("-----Title-----")
+    find = ["Define [a-zA-Z]* at Dictionary.com</title>"]
+    clip = ["Define ", " at Dictionary.com</title>"]
+    root = capture(html, find, clip)[0]
+    return root
 
-    definition = Definition(number, main_description, addition_description)
+def fetch_accociated_words(html):
+    print("-----Accociated Words-----")
+    find = "href=\"http://www.dictionary.com/browse/[a-zA-Z]*"
+    clip = "href=\"http://www.dictionary.com/browse/"
+    accociated_words = set(capture(html, find, clip))
+    print(accociated_words)
 
-    return definition
-
-def make_definitions(dirty_definitions):    # :: [String]
-    definitions = []                        # :: [Definition]
-    for dirty_definition in dirty_definitions:
-        definitions.append(make_definition(dirty_definition))
-
-def make_word(root, definitions):
-    print("makeWord()")
-    word = Word(root)
+def fetch_definitions(html):
+    print("-----Forming Word-----")
+    find = [
+        "<div class=\"deep-link-synonyms\">.+?<div class=\"tail-wrapper\">.+?<div class=\"tail-box tail-type-origin pm-btn-spot\" data-pm-btn-target=\".tail-content\" >"]
+    clip = []
+    all_definitions = capture(html, find, clip, 1)
 
     print("-----Noun Parts-----")
     find = find_definition("<span class=\"dbox-pg\">noun</span>.+?</header>.+?</section>")
     clip = clip_definition()
-    dirty_definition = capture(definitions, find, clip)
+    dirty_definition = capture(all_definitions, find, clip)
 
     print(dirty_definition)
-    definitions = make_definitions(dirty_definition)
-    word.addSection(PartOfSpeech.Noun, definitions)
-
+    new_definitions = make_definitions(dirty_definition)
 
     ##print("-----Verbs (used without object) Parts-----")
     ##find = findDefinition("<span class=\"dbox-pg\">verb.+?.used without object.</span>.+?</section>")
@@ -213,24 +231,20 @@ def make_word(root, definitions):
     ##find = findDefinition("<span class=\"dbox-pg\">verb .used without object.</span>.+?</section>")
     ##clip = clipDefinition()
 
-
     ## Adjective ##
     ##print("-----Adjective-----")
     ##find = findDefinition("<span class=\"dbox-pg\">adjective</span>.+?</section>")
     ##clip = clipDefinition()
-
 
     ## Adverb ##
     ##print("-----Adverb-----")
     ##find = findDefinition("<span class=\"dbox-pg\">adverb</span>.+?</section>")
     ##clip = clipDefinition()
 
-
     ## Pronoun ##
     ##print("-----Pronoun-----")
     ##find = findDefinition("<span class=\"dbox-pg\">pronoun</span>.+?</section>")
     ##clip = clipDefinition()
-
 
     ## Conjunction ##
 
@@ -238,34 +252,62 @@ def make_word(root, definitions):
 
     ## Exclamation ##
 
+def fetch_difficultyIndex(html):
+    print("-----Difficulty Index-----")
+
+def fetch_nearby_words(html):
+    print("-----Nearby Words-----")
+
+def fetch_related_forms(html):
+    print("-----Related Forms-----")
+
+def fetch_can_be_confused(html):
+    print("-----Can Be Confused-----")
+
+def fetch_origin(html):
+    print("-----Origin-----")
+
+def make_word(html):
+
+    word = ''                   # :: String
+    definitions = []      # :: [Definition]
+    difficultyIndex = 0         # :: Integer
+    nearbyWords =   []          # :: [String]
+    relatedForms = []           # :: [String]
+    canBeConfused = []          # :: [String]
+    origin = ''                 # :: String
+
+    root = fetch_root(html)
+    print(root)
+
+    definitions = fetch_definitions(html)
+    print(definitions)
+
+    difficulty_index = fetch_difficultyIndex(html)
+    print(difficulty_index)
+
+    nearby_words = fetch_nearby_words(html)
+    print(nearby_words)
+
+    related_forms = fetch_related_forms(html)
+    print(related_forms)
+
+    can_be_confused = fetch_can_be_confused(html)
+    print(can_be_confused)
+
+    origin = fetch_origin(html)
+    print(origin)
+
+    find = []
+    clip = []
+
 def lookup_word(word):
     print("Looking up:" + word);
     request_url = "http://www.dictionary.com/browse/" + word + "/";
     print("From:" + request_url + "\n");
     html = requests.get(request_url).text;
 
-
-    print("-----Title-----");
-    pattern = "Define [a-zA-Z]* at Dictionary.com</title>";
-    find = [pattern];
-    clip = ["Define ", " at Dictionary.com</title>"];
-    title = capture(html, find, clip)[0]
-    print(title)
-
-    print("-----Forming Word-----");
-    find = ["<div class=\"deep-link-synonyms\">.+?<div class=\"tail-wrapper\">.+?<div class=\"tail-box tail-type-origin pm-btn-spot\" data-pm-btn-target=\".tail-content\" >"]
-    clip = []
-    definitions = capture(html, find, clip, 1)
-    print(definitions)
-    word = make_word(title, definitions[0])
-
-    print("-----Accociated Words-----")
-    find = "href=\"http://www.dictionary.com/browse/[a-zA-Z]*"
-    clip = "href=\"http://www.dictionary.com/browse/"
-    accociatedWords = set(capture(html, find, clip));
-    print(accociatedWords)
-
-    print("-----Related Forms-----")
+    word = make_word(html);
 
 lookup_word("board")
 
