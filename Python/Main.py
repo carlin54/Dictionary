@@ -19,22 +19,25 @@ class Description:
     context = ''
     example = ''
 
+    def __init__(self, context, example):
+        self.context = context
+        self.example = example
+
 class Definition:
-    number = 1                      # :: Integer
+    number = 1                      # :: Integer || Char
     mainDescription = []            # :: Description
     additionalDescriptions = []     # :: [Description]
 
-    def __init__(self, number=0, mainDescription=[], additionalDescriptions=[]):
+    def __init__(self, number=0, main_description=[], additional_descriptions=[]):
         self.number = number
-        self.mainDescription = mainDescription
-        self.additionalDescriptions = additionalDescriptions
+        self.mainDescription = main_description
+        self.additionalDescriptions = additional_descriptions
 
     def setMainDescription(self, mainDescription):
         self.mainDescription = mainDescription
 
     def setAdditionalDescription(self, additionalDescriptions):
         self.additionalDescriptions = additionalDescriptions
-
 
 class Section:
     partOfSpeech = ''           # :: Part of Speech
@@ -50,7 +53,6 @@ class Section:
     def setDefinitions(self, definitions):
         self.definitions = definitions
 
-
 class Word:
     word = ''                 # :: String
     sectionDefinition = []    # :: [Definition]
@@ -64,6 +66,14 @@ class Word:
             section = Section(partofspeech, section)
             self.sectionDefinition.append(section)
 
+class Meaning:
+    number = 0
+    definition = None
+    example = None
+
+    def _init__(self, definition, example):
+        self.definition = definition
+        self.example = example
 
 ## Definitions ##
 def find_definition(regex_section):
@@ -76,7 +86,7 @@ def clip_definition():
     regex_clip_new_line = r"\n"
     regex_clip_carriage_return = r"\r"
     regex_clip_l1 = r"<div.*number\">"
-    regex_clip_l2 = r"</span>.+?\">[ ]*"
+    regex_clip_l2 = r"[ ]*</span>.+?<div class=\"def-content\">[ ]*"
     regex_clip_l3 = r"[ ]*</div>"
     regex_clip_href_a = r"<a class=\"dbox-xref dbox-roman\" href=\"http://www.dictionary.com/browse/[a-zA-Z]*\">"
     regex_clip_a = r"</a>"
@@ -93,13 +103,13 @@ def clip_definition():
             regex_clip_l2,
             regex_clip_l3,
             regex_clip_href_a,
-            ## rregex_clip_example_href,
-            ## rregex_clip_example_href_span,
-            ## regex_clip_italic,
-            ## rregex_clip_example
+            #regex_clip_example_href,
+            #regex_clip_example_href_span,
+            regex_clip_italic
+            ## regex_clip_example
             ## regex_clip_bold,
             ## regex_clip_li
-            regex_clip_a
+            ## regex_clip_a
     ]
 
     return clip
@@ -126,124 +136,100 @@ def capture(text, find, clip, n=0):
     else:
         return input[0:max(n,len(input))]
 
-class Meaning:
-    number = 0
-    definition = None
-    example = None
-
-    def _init__(self, defintion, example):
-        self.definition = defintion
-        self.example = example
-
 def cut(regex, text):
     return []
 
-def fetchNumber(definition):
+def fetch_number(definition):
     find = ['[0-9].']
     clip = ['[.]']
     number = capture(definition, find, clip, 1)
     number = int(number[0])
     return number
 
-def makeSublist(descriptions):
-    print("makeSublist()")
+def make_sublist(descriptions):
+    subList = []
+    find_context = ['<li>.*</li>']
+    clip_context = ['<li>[ ]*','[ ]*</li>','[ ]*<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">.+?</span>','</span>']
+    find_example = ['<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">.+?</span>']
+    clip_example = ['<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">','</span>']
+    for description in descriptions:
+        context = capture(description, find_context, clip_context)
+        example = capture(description, find_example, clip_example)
+        description = Description(context, example)
+        subList.append(description)
+    return subList
 
-def fetchAdditionalDescriptions(definition):
-    print("----Fetching Sublist-----")
-
-    # The Sublist [Definition, +? Example]
-
-
-
-    # The Sublist [Definition, +? Example]
-    print(definition)
-    find = ['<ol class="def-sub-list">.+?</ol>','<li>.+?</li>']
+def fetch_additional_descriptions(definition):
+    find = ['<li>.+?</li>']
     clip = []
-    subList = capture(definition, find, clip)
-    if(len(subList) != 0):
-        return []
+    dirty_sublist = capture(definition, find, clip)
+    if(len(dirty_sublist) != 0):
+        return make_sublist(dirty_sublist)
     else:
-        return makeSublist(subList)
+        return []
 
-
-def fetchMainDescription(definition):
-    print("fetchMainDescription(definition)")
+def fetch_main_description(dirty_definition):
     find = []
-    clip = ['[0-9]+[.]', '<span class=\"dbox-italic\">', '<li>.+?</ol>', '</span>', ':.+?',
-            '<div class="def-block def-inline-example"><span class="dbox-example">.+?</span>']
-    context = capture(definition, find, clip, 1)
+    clip = ['[0-9]+[.]', '<span class=\"dbox-italic\">', '<li>.+?</ol>', ':[ ]*<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">.+?</span>']
+    context = capture(dirty_definition, find, clip, 1)
     find = ['<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">.+?</span>']
-    clip = ['<li>.+?</ol>', '</span>', ':.+?<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">']
-    example = capture(definition, find, clip, 1)
-    print(context)
-    print(example)
+    clip = ['<li>.+?</ol>', '</span>', '<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">']
+    example = capture(dirty_definition, find, clip, 1)
+    return Description(context, example)
 
-def makeDefinition(description):        # :: String
-    print("makeDefinition()")
-    print(description)
+def make_definition(dirty_definition):        # :: String
+    number = fetch_number(dirty_definition)
+    main_description = fetch_main_description(dirty_definition)
+    addition_description = fetch_additional_descriptions(dirty_definition)
 
-    number = fetchNumber(description)
-    mainDescription = fetchMainDescription(description)
-    #additionDescription = fetchAdditionalDescriptions(description)
-
-    return []
-
-
-
-
-    #re.match('<ol class="def-sub-list">.*</ol>')
-    #re.match('<li>.+?</li>')
-    #re.match('<span class="dbox-example">.+?</div>')    #Capture Examples
-
-    # Also
-    #re.match("Also,.+?</div>")
-
-    #re.match('Also,.+?</div>')
+    definition = Definition(number, main_description, addition_description)
 
     return definition
 
-def makeDefinitions(dirtyDefinitions): # :: [String]
-    definitions = []              # :: [Definition]
-    for dirtyDefinition in dirtyDefinitions:
-        definitions.extend(makeDefinition(dirtyDefinition))
+def make_definitions(dirty_definitions):    # :: [String]
+    definitions = []                        # :: [Definition]
+    for dirty_definition in dirty_definitions:
+        definitions.append(make_definition(dirty_definition))
 
-def makeWord(root, definitions):
+def make_word(root, definitions):
+    print("makeWord()")
     word = Word(root)
 
     print("-----Noun Parts-----")
     find = find_definition("<span class=\"dbox-pg\">noun</span>.+?</header>.+?</section>")
-    clip = clip_definition();
-    dirtyDefinitions = capture(definitions, find, clip)
-    definitions = makeDefinitions(dirtyDefinitions)
+    clip = clip_definition()
+    dirty_definition = capture(definitions, find, clip)
+
+    print(dirty_definition)
+    definitions = make_definitions(dirty_definition)
     word.addSection(PartOfSpeech.Noun, definitions)
-    print(definitions)
-
-    print("-----Verbs (used without object) Parts-----")
-    find = find_definition("<span class=\"dbox-pg\">verb.+?.used without object.</span>.+?</section>")
-    clip = clip_definition()
 
 
-    print("-----Verbs (used with object) Parts-----")
-    find = find_definition("<span class=\"dbox-pg\">verb .used without object.</span>.+?</section>")
-    clip = clip_definition()
+    ##print("-----Verbs (used without object) Parts-----")
+    ##find = findDefinition("<span class=\"dbox-pg\">verb.+?.used without object.</span>.+?</section>")
+    ##clip = clipDefinition()
+
+    ##print("-----Verbs (used with object) Parts-----")
+    ##find = findDefinition("<span class=\"dbox-pg\">verb .used without object.</span>.+?</section>")
+    ##clip = clipDefinition()
 
 
     ## Adjective ##
-    print("-----Adjective-----")
-    find = find_definition("<span class=\"dbox-pg\">adjective</span>.+?</section>")
-    clip = clip_definition()
+    ##print("-----Adjective-----")
+    ##find = findDefinition("<span class=\"dbox-pg\">adjective</span>.+?</section>")
+    ##clip = clipDefinition()
 
 
     ## Adverb ##
-    print("-----Adverb-----")
-    find = find_definition("<span class=\"dbox-pg\">adverb</span>.+?</section>")
-    clip = clip_definition()
+    ##print("-----Adverb-----")
+    ##find = findDefinition("<span class=\"dbox-pg\">adverb</span>.+?</section>")
+    ##clip = clipDefinition()
 
 
     ## Pronoun ##
-    print("-----Pronoun-----")
-    find = find_definition("<span class=\"dbox-pg\">pronoun</span>.+?</section>")
-    clip = clip_definition()
+    ##print("-----Pronoun-----")
+    ##find = findDefinition("<span class=\"dbox-pg\">pronoun</span>.+?</section>")
+    ##clip = clipDefinition()
 
 
     ## Conjunction ##
@@ -251,7 +237,6 @@ def makeWord(root, definitions):
     ## Determiner ##
 
     ## Exclamation ##
-
 
 def lookup_word(word):
     print("Looking up:" + word);
@@ -272,7 +257,7 @@ def lookup_word(word):
     clip = []
     definitions = capture(html, find, clip, 1)
     print(definitions)
-    word = makeWord(title, definitions[0])
+    word = make_word(title, definitions[0])
 
     print("-----Accociated Words-----")
     find = "href=\"http://www.dictionary.com/browse/[a-zA-Z]*"
