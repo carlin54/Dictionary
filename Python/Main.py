@@ -1,19 +1,22 @@
 import requests
 import re
+from enum import Enum
 
 ##word = input("Word -> ");
 ##https://pythex.org/
 
-class PartOfSpeech:
-    Noun = 0
-    Verb = 1
-    Adjective = 2
-    Adverb = 3
-    Pronoun = 4
-    Preposition = 5
-    Conjunction = 6
-    Determiner = 7
-    Exclamation = 9
+class PartOfSpeech(Enum):
+    NOUN = 0
+    VERB_USED_WITHOUT_OBJECT = 1
+    VERB_USED_WITH_OBJECT = 2
+    ADJECTIVE = 3
+    ADVERB = 4
+    PRONOUN = 5
+    PREPOSITIONAL = 6
+    CONJUNCTION = 7
+    DETERMINER = 8
+    EXCLAMATION = 9
+
 
 class Description:
     context = ''
@@ -53,6 +56,15 @@ class Section:
     def setDefinitions(self, definitions):
         self.definitions = definitions
 
+class Sections:
+    sections = []
+    def __init__(self, sections=[]):
+        self.sections = sections
+
+    def addSection(self, section):
+        if(section.definitions != []):
+            self.sections.append(section)
+
 class Word:
     word = ''                   # :: String
     sectionDefinition = []      # :: [Definition]
@@ -80,7 +92,12 @@ class Meaning:
         self.example = example
 
 def capture(text, find, clip, n=0):
-    input = [text]
+    input = []
+    if(isinstance(text, str)):
+        input = [text]
+    else:
+        input = text
+
     for i in range(0, len(find)):
         output = []
         for j in range(0, len(input)):
@@ -149,8 +166,20 @@ def fetch_number(definition):
     number = int(number[0])
     return number
 
+def fetch_main_description(dirty_definition):
+    find = []
+    clip = ['[0-9]+[.]', '<span class=\"dbox-italic\">', '<li>.+?</ol>',
+            ':[ ]*<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">.+?</span>',
+            '<span class=\"dbox-bold\">', '</span>', '[ ]*<ol class="def-sub-list">[ ]*', '</a>',
+            '<a class=\"dbox-xref dbox-roman\" href=\"http://www.dictionary.com/browse/circuit-board\">']
+    context = capture(dirty_definition, find, clip, 1)
+    find = ['<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">.+?</span>']
+    clip = ['<li>.+?</ol>', '</span>', '<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">']
+    example = capture(dirty_definition, find, clip, 1)
+    return Description(context, example)
+
 def make_sublist(descriptions):
-    subList = []
+    sub_list = []
     find_context = ['<li>.*</li>']
     clip_context = ['<li>[ ]*','[ ]*</li>','[ ]*<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">.+?</span>','</span>']
     find_example = ['<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">.+?</span>']
@@ -159,22 +188,8 @@ def make_sublist(descriptions):
         context = capture(description, find_context, clip_context)
         example = capture(description, find_example, clip_example)
         description = Description(context, example)
-        subList.append(description)
-    return subList
-
-def make_definition(dirty_definition):        # :: String
-    number = fetch_number(dirty_definition)
-    main_description = fetch_main_description(dirty_definition)
-    addition_description = fetch_additional_descriptions(dirty_definition)
-
-    definition = Definition(number, main_description, addition_description)
-
-    return definition
-
-def make_definitions(dirty_definitions):    # :: [String]
-    definitions = []                        # :: [Definition]
-    for dirty_definition in dirty_definitions:
-        definitions.append(make_definition(dirty_definition))
+        sub_list.append(description)
+    return sub_list
 
 def fetch_additional_descriptions(definition):
     find = ['<li>.+?</li>']
@@ -185,18 +200,21 @@ def fetch_additional_descriptions(definition):
     else:
         return []
 
-def fetch_main_description(dirty_definition):
-    find = []
-    clip = ['[0-9]+[.]', '<span class=\"dbox-italic\">', '<li>.+?</ol>', ':[ ]*<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">.+?</span>']
-    context = capture(dirty_definition, find, clip, 1)
-    find = ['<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">.+?</span>']
-    clip = ['<li>.+?</ol>', '</span>', '<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">']
-    example = capture(dirty_definition, find, clip, 1)
-    return Description(context, example)
+def make_definition(dirty_definition):        # :: String
+    number = fetch_number(dirty_definition)
+    main_description = fetch_main_description(dirty_definition)
+    addition_description = fetch_additional_descriptions(dirty_definition)
+    definition = Definition(number, main_description, addition_description)
+    return definition
+
+def make_definitions(dirty_definitions):    # :: [String]
+    definitions = []                        # :: [Definition]
+    for dirty_definition in dirty_definitions:
+        definitions.append(make_definition(dirty_definition))
 
 def fetch_root(html):
     print("-----Title-----")
-    find = ["Define [a-zA-Z]* at Dictionary.com</title>"]
+    find = ["Define [a-zA-Z-]* at Dictionary.com</title>"]
     clip = ["Define ", " at Dictionary.com</title>"]
     root = capture(html, find, clip)[0]
     return root
@@ -206,51 +224,82 @@ def fetch_accociated_words(html):
     find = "href=\"http://www.dictionary.com/browse/[a-zA-Z]*"
     clip = "href=\"http://www.dictionary.com/browse/"
     accociated_words = set(capture(html, find, clip))
-    print(accociated_words)
 
-def fetch_definitions(html):
+
+def fetch_section(section_definitions, pos, find):
+    find = find_definition(find)
+    clip = clip_definition()
+    pos_definition = capture(section_definitions, find, clip)
+    print(pos_definition)
+    if(pos_definition != []):
+        definitions = make_definition(pos_definition)
+        return Section(pos, definitions)
+    else:
+        return Section(pos, [])
+
+
+def fetch_sections(html):
     print("-----Forming Word-----")
     find = [
         "<div class=\"deep-link-synonyms\">.+?<div class=\"tail-wrapper\">.+?<div class=\"tail-box tail-type-origin pm-btn-spot\" data-pm-btn-target=\".tail-content\" >"]
     clip = []
-    all_definitions = capture(html, find, clip, 1)
+    definition_section = capture(html, find, clip, 1)
+
+    sections = Sections()
 
     print("-----Noun Parts-----")
-    find = find_definition("<span class=\"dbox-pg\">noun</span>.+?</header>.+?</section>")
-    clip = clip_definition()
-    dirty_definition = capture(all_definitions, find, clip)
+    find = "<span class=\"dbox-pg\">noun</span>.+?</header>.+?</section>"
+    section = fetch_section(definition_section, PartOfSpeech.NOUN, find)
+    sections.addSection(section)
+    print(section.definitions)
 
-    print(dirty_definition)
-    new_definitions = make_definitions(dirty_definition)
+    print("-----Verbs (used without object) Parts-----")
+    find = "<span class=\"dbox-pg\">verb .used without object.+?</span>.+?</section>"
+    section = fetch_section(definition_section, PartOfSpeech.NOUN, find)
+    sections.addSection(section)
+    print(section.definitions)
 
-    ##print("-----Verbs (used without object) Parts-----")
-    ##find = findDefinition("<span class=\"dbox-pg\">verb.+?.used without object.</span>.+?</section>")
-    ##clip = clipDefinition()
-
-    ##print("-----Verbs (used with object) Parts-----")
-    ##find = findDefinition("<span class=\"dbox-pg\">verb .used without object.</span>.+?</section>")
-    ##clip = clipDefinition()
+    print("-----Verbs (used with object) Parts-----")
+    find = "<span class=\"dbox-pg\">verb .used with object.+?</span>.+?</section>"
+    section = fetch_section(definition_section, PartOfSpeech.NOUN, find)
+    sections.addSection(section)
+    print(section.definitions)
 
     ## Adjective ##
-    ##print("-----Adjective-----")
-    ##find = findDefinition("<span class=\"dbox-pg\">adjective</span>.+?</section>")
-    ##clip = clipDefinition()
+    print("-----Adjective-----")
+    find = "<span class=\"dbox-pg\">adjective.+?</span>.+?</section>"
+    section = fetch_section(definition_section, PartOfSpeech.NOUN, find)
+    sections.addSection(section)
 
     ## Adverb ##
-    ##print("-----Adverb-----")
-    ##find = findDefinition("<span class=\"dbox-pg\">adverb</span>.+?</section>")
-    ##clip = clipDefinition()
+    print("-----Adverb-----")
+    find = "<span class=\"dbox-pg\">adverb.+?</span>.+?</section>"
+    section = fetch_section(definition_section, PartOfSpeech.NOUN, find)
+    sections.addSection(section)
+    print(section.definitions)
 
     ## Pronoun ##
-    ##print("-----Pronoun-----")
-    ##find = findDefinition("<span class=\"dbox-pg\">pronoun</span>.+?</section>")
-    ##clip = clipDefinition()
+    print("-----Pronoun-----")
+    find = "<span class=\"dbox-pg\">pronoun.+?</span>.+?</section>"
+    section = fetch_section(definition_section, PartOfSpeech.NOUN, find)
+    sections.addSection(section)
 
     ## Conjunction ##
+    print("-----Conjunction-----")
+    find = "<span class=\"dbox-pg\">conjunction</span>.+?</section>"
+    section = fetch_section(definition_section, PartOfSpeech.NOUN, find)
+    sections.addSection(section)
+    print(section.definitions)
 
     ## Determiner ##
+    print("-----Determiner-----")
+    find = "<span class=\"dbox-pg\">verb.+?.used without object.</span>.+?</section>"
+    section = fetch_section(definition_section, PartOfSpeech.NOUN, find)
+    sections.addSection(section)
+    print(section.definitions)
 
     ## Exclamation ##
+    return sections
 
 def fetch_difficultyIndex(html):
     print("-----Difficulty Index-----")
@@ -270,7 +319,7 @@ def fetch_origin(html):
 def make_word(html):
 
     word = ''                   # :: String
-    definitions = []      # :: [Definition]
+    sections = []               # :: [Section]
     difficultyIndex = 0         # :: Integer
     nearbyWords =   []          # :: [String]
     relatedForms = []           # :: [String]
@@ -280,7 +329,7 @@ def make_word(html):
     root = fetch_root(html)
     print(root)
 
-    definitions = fetch_definitions(html)
+    definitions = fetch_sections(html)
     print(definitions)
 
     difficulty_index = fetch_difficultyIndex(html)
@@ -309,5 +358,5 @@ def lookup_word(word):
 
     word = make_word(html);
 
-lookup_word("board")
+lookup_word("silver-tongued")
 
