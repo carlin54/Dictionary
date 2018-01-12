@@ -2,6 +2,45 @@ import requests
 import re
 from enum import Enum
 
+class rbnode:
+    def __init__(self, key):
+        self.key = key
+        self.isRed = False
+        self.left = None
+        self.right = None
+        self.p = None
+
+class rbtree:
+    def __init__(self):
+        self.root = self.nil
+
+    def search(self, key, x=None):
+        print('search')
+
+    def minimum(self, key, x=None):
+        print('minimum')
+
+    def maximum(self, key, x=None):
+        print('maximum')
+
+    def insert_key(self, key):
+        print('insert key')
+
+    def insert_node(self, z):
+        print('insert node')
+
+    def insert_fixup(self, z):
+        print('insert_fixup')
+
+    def left_rotate(self, x):
+        print('left_rotate')
+
+    def right_rotate(self, y):
+        print('right_rotate')
+
+    def check_invariants(self):
+        print('check_invariants')
+        
 ##word = input("Word -> ");
 ##https://pythex.org/
 
@@ -16,7 +55,6 @@ class PartOfSpeech(Enum):
     CONJUNCTION = 7
     DETERMINER = 8
     EXCLAMATION = 9
-
 
 class Description:
     context = ''
@@ -73,6 +111,8 @@ class Word:
     relatedForms = []           # :: [String]
     canBeConfused = []          # :: [String]
     origin = ''                 # :: String
+    synonyms = []               # :: Synonyms
+
     def __init__(self, word):
         self.word = word
         self.sectionDefinition = []
@@ -225,7 +265,6 @@ def fetch_accociated_words(html):
     clip = "href=\"http://www.dictionary.com/browse/"
     accociated_words = set(capture(html, find, clip))
 
-
 def fetch_section(section_definitions, pos, find):
     find = find_definition(find)
     clip = clip_definition()
@@ -236,7 +275,6 @@ def fetch_section(section_definitions, pos, find):
         return Section(pos, definitions)
     else:
         return Section(pos, [])
-
 
 def fetch_sections(html):
     print("-----Forming Word-----")
@@ -325,6 +363,7 @@ def make_word(html):
     relatedForms = []           # :: [String]
     canBeConfused = []          # :: [String]
     origin = ''                 # :: String
+    synonyms = []               # :: [String]
 
     root = fetch_root(html)
     print(root)
