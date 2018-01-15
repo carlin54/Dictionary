@@ -2,45 +2,113 @@ import requests
 import re
 from enum import Enum
 
-class rbnode:
+class RedBlackNode:
     def __init__(self, key):
         self.key = key
         self.isRed = False
         self.left = None
         self.right = None
-        self.p = None
+        self.parent = None
 
-class rbtree:
+
+class RedBlackTree:
+    #       5
+    #      / \
+    #     3   7
+    #    /\  /\
+    #   2 4 6 8
+
     def __init__(self):
         self.root = self.nil
+        self.nil = RedBlackNode(key=None)
+
 
     def search(self, key, x=None):
+
         print('search')
 
-    def minimum(self, key, x=None):
-        print('minimum')
+        if(x == self.nil):
+            x = self.root
 
-    def maximum(self, key, x=None):
+        while(x == self.nil or x.key != key):
+            if(key > x.key):
+                x = x.right
+            else:
+                x = x.left
+
+        return x
+
+    def minimum(self, x=None):
+        print('minimum')
+        if(x == self.nil):
+            x = self.root
+
+        while(x.left != self.nil):
+            x = x.left
+
+        return x
+
+
+    def maximum(self, x=None):
         print('maximum')
+
+        if (x == self.nil):
+            x = self.root
+
+        while (x.left != self.nil):
+            x = x.right
+
+        return x
 
     def insert_key(self, key):
         print('insert key')
 
     def insert_node(self, z):
         print('insert node')
+        parent = self.nil
+        x = self.root
+        while(x != self.nil):
+            y = x
+            if(z.key < x.key):
+                x = x.left
+            else:
+                x = x.right
+        z.parent = parent
+        z.left = self.nil
+        z.right = self.nil
+        z.isRed = True
+        self.insert_fixup(z)
 
     def insert_fixup(self, z):
         print('insert_fixup')
 
     def left_rotate(self, x):
         print('left_rotate')
+        y = x.right
+        x.right = y.left
+        if(x.right != self.nil):
+            y.parent.left = x
 
-    def right_rotate(self, y):
+        x.parent = x.right
+        x.right = x.parent.left
+        x.parent.left = x
+
+        # x.right = x.parent.left
+        # x.parent.left = x
+
+    def right_rotate(self, x):
         print('right_rotate')
+        x.parent = x.right
+        x.right = x.parent.left
+        x.parent.left = x
 
     def check_invariants(self):
         print('check_invariants')
-        
+
+def main():
+    word = fetch_word("board")
+
+
 ##word = input("Word -> ");
 ##https://pythex.org/
 
@@ -339,63 +407,67 @@ def fetch_sections(html):
     ## Exclamation ##
     return sections
 
-def fetch_difficultyIndex(html):
-    print("-----Difficulty Index-----")
-
-def fetch_nearby_words(html):
-    print("-----Nearby Words-----")
-
 def fetch_related_forms(html):
     print("-----Related Forms-----")
 
-def fetch_can_be_confused(html):
-    print("-----Can Be Confused-----")
+    find = ["Related forms[ ]*<button class=\"button-source\"[ ]*type=\"button\">Expand</button>.+?<div class=\"tail-header[ ]*\"[ ]*>",
+            "<span class=\"dbox-bold\" data-syllable=\"[A-Za-z·]*, \">[A-Za-z]*, </span>"]
 
-def fetch_origin(html):
-    print("-----Origin-----")
+    clip = ["\r", "\n", "<span class=\"dbox-bold\" data-syllable=\".+?\">",
+            ",", " [ ]*</span>"]
 
-def make_word(html):
+    related_forms = capture(html, find, clip)
+    return related_forms
+
+def fetch_synonyms(thesaurus):
+    find = ['<div class=\"relevancy-block\">.+?<div id="filter-[0-9]*">','<ul>.+?</ul>']
+    clip = ["\r","\n","<ul>.*<span class=\"text\">","</span>.*"]
+    synonyms = capture(thesaurus, find, clip)
+    print(synonyms)
+    return synonyms
+
+def make_word(dictionary, thesaurus):
 
     word = ''                   # :: String
     sections = []               # :: [Section]
-    difficultyIndex = 0         # :: Integer
-    nearbyWords =   []          # :: [String]
     relatedForms = []           # :: [String]
-    canBeConfused = []          # :: [String]
-    origin = ''                 # :: String
     synonyms = []               # :: [String]
 
-    root = fetch_root(html)
+    root = fetch_root(dictionary)
     print(root)
 
-    definitions = fetch_sections(html)
+    definitions = fetch_sections(dictionary)
     print(definitions)
 
-    difficulty_index = fetch_difficultyIndex(html)
+    difficulty_index = fetch_difficultyIndex(dictionary)
     print(difficulty_index)
 
-    nearby_words = fetch_nearby_words(html)
+    nearby_words = fetch_nearby_words(dictionary)
     print(nearby_words)
 
-    related_forms = fetch_related_forms(html)
+    related_forms = fetch_related_forms(dictionary)
     print(related_forms)
 
-    can_be_confused = fetch_can_be_confused(html)
+    can_be_confused = fetch_can_be_confused(dictionary)
     print(can_be_confused)
 
-    origin = fetch_origin(html)
+    origin = fetch_origin(dictionary)
     print(origin)
 
+    synonyms = fetch_synonyms(thesaurus)
+    print(synonyms)
     find = []
     clip = []
 
-def lookup_word(word):
-    print("Looking up:" + word);
-    request_url = "http://www.dictionary.com/browse/" + word + "/";
-    print("From:" + request_url + "\n");
-    html = requests.get(request_url).text;
+def fetch_word(word):
 
-    word = make_word(html);
+    dictionary_url = "http://www.dictionary.com/browse/" + word + "/"
+    dictionary = requests.get(dictionary_url).text
+    thesaurus_url = "http://www.thesaurus.com/browse/" + word + "/"
+    thesaurus = requests.get(thesaurus_url).text
 
-lookup_word("silver-tongued")
+    word = make_word(dictionary, thesaurus)
 
+    return word
+
+main()
