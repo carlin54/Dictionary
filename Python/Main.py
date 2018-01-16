@@ -1,30 +1,31 @@
 import requests
 import re
 from enum import Enum
+class Color(Enum):
+    RED = True
+    BLACK = False
 
 class RedBlackNode:
     def __init__(self, key):
         self.key = key
-        self.isRed = False
+        self.color = False
         self.left = None
         self.right = None
-        self.parent = None
+        self.p = None
 
 
 class RedBlackTree:
-    #       5
-    #      / \
-    #     3   7
-    #    /\  /\
-    #   2 4 6 8
+    # Refer to Introduction to Algorithms, P 273,
+    # Thomas H. Cormen, Charles E. Leiserson
+    # Ronald L. Rivest, Clifford Stein
 
     def __init__(self):
+        """constructor."""
         self.root = self.nil
         self.nil = RedBlackNode(key=None)
 
-
     def search(self, key, x=None):
-
+        """Iterative implementation to find a specific node in a tree."""
         print('search')
 
         if(x == self.nil):
@@ -39,6 +40,7 @@ class RedBlackTree:
         return x
 
     def minimum(self, x=None):
+        """Iterative implementation to find the minimum value in the tree."""
         print('minimum')
         if(x == self.nil):
             x = self.root
@@ -48,8 +50,8 @@ class RedBlackTree:
 
         return x
 
-
     def maximum(self, x=None):
+        """Iterative implementation to find the maximum value in the tree."""
         print('maximum')
 
         if (x == self.nil):
@@ -60,12 +62,27 @@ class RedBlackTree:
 
         return x
 
+    def successor(self, x):
+        """This function returns the next greatest number in the tree."""
+        if(x.right != self.nil):
+            return self.minimum(x.right)
+
+        y = x.parent
+
+        while(y != self.nil and x == y.right)
+            x = y
+            y = y.parent
+
+        return y
+
     def insert_key(self, key):
+        """Inserts a node with only a key"""
         print('insert key')
 
     def insert_node(self, z):
+        """Inserts a node into the tree."""
         print('insert node')
-        parent = self.nil
+        y = self.nil
         x = self.root
         while(x != self.nil):
             y = x
@@ -73,34 +90,68 @@ class RedBlackTree:
                 x = x.left
             else:
                 x = x.right
-        z.parent = parent
+        z.parent = y
+
+        if(y == self.nil):  # The tree was empty
+            self.root = z
+        elif(z.key < y.key):
+            y.left = z
+        else:
+            y.right = z
+
         z.left = self.nil
         z.right = self.nil
-        z.isRed = True
+        z.color = Color.RED
         self.insert_fixup(z)
 
     def insert_fixup(self, z):
         print('insert_fixup')
 
+    def delete_key(self, z):
+        print('delete key')
+
+    def delete_node(self, z):
+        print('delete node')
+
     def left_rotate(self, x):
         print('left_rotate')
-        y = x.right
-        x.right = y.left
-        if(x.right != self.nil):
-            y.parent.left = x
+        """Left rotation on the tree."""
+        y = x.right                     # Set Y
+        x.right = y.left                # Turn y's left subtree into x's right subtree.
 
-        x.parent = x.right
-        x.right = x.parent.left
-        x.parent.left = x
+        if(y.left != self.nil):         # If y has a left child.
+            y.left.p = x                # Set y's left child to be the child of x.
+        y.p = x.p                       # Link x's parent to y.
 
-        # x.right = x.parent.left
-        # x.parent.left = x
+        if(x.p == self.nil):            # If x is root, y is now root.
+            self.root = y
+        elif(x == x.p.left):            # Finding the right side for y in x's parent.
+            x.p.left = y
+        else:
+            x.p.right = y
+        y.left = x                      # Put x on y's left.
+        x.p = y
 
-    def right_rotate(self, x):
+    def right_rotate(self, y):
         print('right_rotate')
-        x.parent = x.right
-        x.right = x.parent.left
-        x.parent.left = x
+        """Right rotation on the tree"""
+        x = y.left                      # Set y.
+        x.right = y.left                # Turn x's right subtree into y's left subtree.
+
+        if(x.right != self.nil):        # If x has a right child.
+            x.right.p = y               # Set x's right child to be a child of y.
+
+        y.p = x.p                       # Link y's parent to x.
+
+        if(y.p == self.nil):            # If y was the root, x is now the root.
+            self.root = x
+        elif(y == y.p.left):            # Finding the right side for x in y's parent.
+            y.p.left = x
+        else:
+            y.p.right = x
+
+        x.right = y                     # Put y on x's right.
+        y.p = x
 
     def check_invariants(self):
         print('check_invariants')
@@ -439,20 +490,8 @@ def make_word(dictionary, thesaurus):
     definitions = fetch_sections(dictionary)
     print(definitions)
 
-    difficulty_index = fetch_difficultyIndex(dictionary)
-    print(difficulty_index)
-
-    nearby_words = fetch_nearby_words(dictionary)
-    print(nearby_words)
-
     related_forms = fetch_related_forms(dictionary)
     print(related_forms)
-
-    can_be_confused = fetch_can_be_confused(dictionary)
-    print(can_be_confused)
-
-    origin = fetch_origin(dictionary)
-    print(origin)
 
     synonyms = fetch_synonyms(thesaurus)
     print(synonyms)
