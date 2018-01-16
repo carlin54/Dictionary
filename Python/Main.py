@@ -1,14 +1,14 @@
 import requests
 import re
 from enum import Enum
-class Color(Enum):
+class Colour(Enum):
     RED = True
     BLACK = False
 
 class RedBlackNode:
     def __init__(self, key):
         self.key = key
-        self.color = False
+        self.colour = False
         self.left = None
         self.right = None
         self.p = None
@@ -19,6 +19,21 @@ class RedBlackTree:
     # Thomas H. Cormen, Charles E. Leiserson
     # Ronald L. Rivest, Clifford Stein
 
+    # Also
+    # Red Black Tree (Python Recipe)
+    # http://code.activestate.com/recipes/576817-red-black-tree/
+    # John Reid
+
+    """
+    Red-black tree properties
+        1. Every node is either red or black.
+        2. The root is black.
+        3. Every leaf (NIL) is black.
+        4. If a node is red, then both its children are black.
+        5. For each node, all paths from the node descendant leaves
+           contain the same number of black nodes.
+
+    """
     def __init__(self):
         """constructor."""
         self.root = self.nil
@@ -76,7 +91,7 @@ class RedBlackTree:
         return y
 
     def insert_key(self, key):
-        """Inserts a node with only a key"""
+        """Inserts a node with only a key."""
         print('insert key')
 
     def insert_node(self, z):
@@ -101,17 +116,83 @@ class RedBlackTree:
 
         z.left = self.nil
         z.right = self.nil
-        z.color = Color.RED
+        z.colour = Colour.RED
         self.insert_fixup(z)
 
     def insert_fixup(self, z):
         print('insert_fixup')
+        """
+        After insertion potential violation of properties are property 2 and 4.
+            2. The root is black.
+            4. If a node is red, then both its children are black.
+        This is due to z being coloured red
+            where z is the newly inserted node
+        
+        Figure 13.4
+        (b) Case 1: z's uncle y is red, z's parent p is black, z is red
+            -> Set my parent to black
+            -> Set my uncle to black
+            -> Set my grandparent to red
+            (.) Repair the structure, and set up for the next iteration
+        (c) Case 2: z's uncle y is black and z is the right child
+            -> If z is the right child
+                -> set z to p
+                -> rotate left on z
+            (.) Make it turn it into case 3
+                   
+        (d) Case 3: z's uncle y is black and z is the left child
+            -> Set z's parent to black
+            -> Set z's uncle to red
+            -> rotate right on z's uncle
+            (.) Makes z's parent blackm so that if z's parent is the root at 
+            the start of the next iteration it is black
+            
+        """
+        while(z.p.colour == Colour.RED):                # Terminate when z's parent is black
+            if(z.p == z.p.p.left):                          # If my parent is on the left side of my grandparent
+                y = z.p.p.right                                 # Set y to be z's uncle
+                if(y.colour == Colour.RED):                     # If my uncle is red
+                    z.p.colour = Colour.BLACK                       # Set z's parent colour to black.       # Case 1
+                    y.colour = Colour.BLACK                         # Set z's uncle colour to black.        # Case 1
+                    z.p.p.colour = Colour.RED                       # Set z's grand parent colour to red.   # Case 1
+                    z = z.p.p                                       # Set z to z's grandparent.             # Case 1
+                                                                    # This is done for to fix it for the next iteration.
+                else:
+                    if(z == z.p.right):                     # If z is on the right side of my parent.
+                        z = z.p                                 # Set z to be z's parent.                  # Case 2
+                        self.left_rotate(z)                     # Rotate left on z.                        # Case 2
+                    z.p.colour = Colour.BLACK               # Set z's parent to black.                     # Case 3
+                    z.p.p.colour = Colour.RED               # Set z's grandparent to colour to red.        # Case 3
+                    self.rotate_right(z.p.p)                # Rotate right on z's grandparent.             # Case 3
+
+            else:                                       # If my parent is on the right side of my grandparent.
+                y = z.p.p.left                              # Set y to be z's uncle.
+                if(y.colour == Colour.RED):                 # If my uncle is red.
+                    z.p.colour = Colour.BLACK                   # Set z's parent colour to black.          # Case 1
+                    y.colour = Colour.BLACK                     # Set z's uncle colour to black.           # Case 1
+                    z.p.p.colour = Colour.RED                   # Set z's grandparent colour to red.       # Case 1
+                    z = z.p.p                                   # Set z to z's grandparent.                # Case 1
+                                                                # This is done for to fix it for the next iteration.
+                else:
+                    if(z == z.p.left):                      # If z is on the left side of my parent
+                        z = z.p                                 # Set y to be z's uncle.                   # Case 2
+                        self.right_rotate(z)                    # Rotate right on z.                       # Case 2
+                    z.p.colour = Colour.BLACK               # Set z's parent to black.                     # Case 3
+                    z.p.p.colour = Colour.RED               # Set z's grandparent to colour to red.        # Case 3
+                    self.left_rotate(z.p.p)                 # Rotate left on z's grandparent.              # Case 3
+
+        self.root.colour = Colour.BLACK
+
+
 
     def delete_key(self, z):
         print('delete key')
 
     def delete_node(self, z):
         print('delete node')
+
+    def delete_fixup(self, x):
+        print("delete fix up")
 
     def left_rotate(self, x):
         print('left_rotate')
