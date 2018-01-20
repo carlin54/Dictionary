@@ -8,10 +8,10 @@ class Colour(Enum):
 class RedBlackNode:
     def __init__(self, key):
         self.key = key
-        self.colour = False
-        self.left = None
-        self.right = None
-        self.p = None
+        self.colour = Colour.RED
+        self.left = []
+        self.right = []
+        self.p = []
 
 
 class RedBlackTree:
@@ -36,10 +36,10 @@ class RedBlackTree:
     """
     def __init__(self):
         """constructor."""
+        self.nil = RedBlackNode(key=[])
         self.root = self.nil
-        self.nil = RedBlackNode(key=None)
 
-    def search(self, key, x=None):
+    def search(self, key, x=[]):
         """Iterative implementation to find a specific node in a tree."""
         print('search')
 
@@ -54,7 +54,7 @@ class RedBlackTree:
 
         return x
 
-    def minimum(self, x=None):
+    def minimum(self, x=[]):
         """Iterative implementation to find the minimum value in the tree."""
         print('minimum')
         if(x == self.nil):
@@ -65,7 +65,7 @@ class RedBlackTree:
 
         return x
 
-    def maximum(self, x=None):
+    def maximum(self, x=[]):
         """Iterative implementation to find the maximum value in the tree."""
         print('maximum')
 
@@ -84,7 +84,7 @@ class RedBlackTree:
 
         y = x.parent
 
-        while(y != self.nil and x == y.right)
+        while(y != self.nil and x == y.right):
             x = y
             y = y.parent
 
@@ -93,6 +93,8 @@ class RedBlackTree:
     def insert_key(self, key):
         """Inserts a node with only a key."""
         print('insert key')
+        rbnode = RedBlackNode(key)
+        self.insert_node(rbnode)
 
     def insert_node(self, z):
         """Inserts a node into the tree."""
@@ -148,42 +150,41 @@ class RedBlackTree:
             the start of the next iteration it is black
             
         """
-        while(z.p.colour == Colour.RED):                # Terminate when z's parent is black
-            if(z.p == z.p.p.left):                          # If my parent is on the left side of my grandparent
-                y = z.p.p.right                                 # Set y to be z's uncle
-                if(y.colour == Colour.RED):                     # If my uncle is red
-                    z.p.colour = Colour.BLACK                       # Set z's parent colour to black.       # Case 1
-                    y.colour = Colour.BLACK                         # Set z's uncle colour to black.        # Case 1
-                    z.p.p.colour = Colour.RED                       # Set z's grand parent colour to red.   # Case 1
-                    z = z.p.p                                       # Set z to z's grandparent.             # Case 1
-                                                                    # This is done for to fix it for the next iteration.
-                else:
-                    if(z == z.p.right):                     # If z is on the right side of my parent.
-                        z = z.p                                 # Set z to be z's parent.                  # Case 2
-                        self.left_rotate(z)                     # Rotate left on z.                        # Case 2
-                    z.p.colour = Colour.BLACK               # Set z's parent to black.                     # Case 3
-                    z.p.p.colour = Colour.RED               # Set z's grandparent to colour to red.        # Case 3
-                    self.rotate_right(z.p.p)                # Rotate right on z's grandparent.             # Case 3
+        if(z.p != []):
+            while(z.p.colour == Colour.RED):                # Terminate when z's parent is black
+                if(z.p == z.p.p.left):                          # If my parent is on the left side of my grandparent
+                    y = z.p.p.right                                 # Set y to be z's uncle
+                    if(y.colour == Colour.RED):                     # If my uncle is red
+                        z.p.colour = Colour.BLACK                       # Set z's parent colour to black.       # Case 1
+                        y.colour = Colour.BLACK                         # Set z's uncle colour to black.        # Case 1
+                        z.p.p.colour = Colour.RED                       # Set z's grand parent colour to red.   # Case 1
+                        z = z.p.p                                       # Set z to z's grandparent.             # Case 1
+                                                                        # This is done for to fix it for the next iteration.
+                    else:
+                        if(z == z.p.right):                     # If z is on the right side of my parent.
+                            z = z.p                                 # Set z to be z's parent.                  # Case 2
+                            self.left_rotate(z)                     # Rotate left on z.                        # Case 2
+                        z.p.colour = Colour.BLACK               # Set z's parent to black.                     # Case 3
+                        z.p.p.colour = Colour.RED               # Set z's grandparent to colour to red.        # Case 3
+                        self.rotate_right(z.p.p)                # Rotate right on z's grandparent.             # Case 3
 
-            else:                                       # If my parent is on the right side of my grandparent.
-                y = z.p.p.left                              # Set y to be z's uncle.
-                if(y.colour == Colour.RED):                 # If my uncle is red.
-                    z.p.colour = Colour.BLACK                   # Set z's parent colour to black.          # Case 1
-                    y.colour = Colour.BLACK                     # Set z's uncle colour to black.           # Case 1
-                    z.p.p.colour = Colour.RED                   # Set z's grandparent colour to red.       # Case 1
-                    z = z.p.p                                   # Set z to z's grandparent.                # Case 1
-                                                                # This is done for to fix it for the next iteration.
-                else:
-                    if(z == z.p.left):                      # If z is on the left side of my parent
-                        z = z.p                                 # Set y to be z's uncle.                   # Case 2
-                        self.right_rotate(z)                    # Rotate right on z.                       # Case 2
-                    z.p.colour = Colour.BLACK               # Set z's parent to black.                     # Case 3
-                    z.p.p.colour = Colour.RED               # Set z's grandparent to colour to red.        # Case 3
-                    self.left_rotate(z.p.p)                 # Rotate left on z's grandparent.              # Case 3
+                else:                                       # If my parent is on the right side of my grandparent.
+                    y = z.p.p.left                              # Set y to be z's uncle.
+                    if(y.colour == Colour.RED):                 # If my uncle is red.
+                        z.p.colour = Colour.BLACK                   # Set z's parent colour to black.          # Case 1
+                        y.colour = Colour.BLACK                     # Set z's uncle colour to black.           # Case 1
+                        z.p.p.colour = Colour.RED                   # Set z's grandparent colour to red.       # Case 1
+                        z = z.p.p                                   # Set z to z's grandparent.                # Case 1
+                                                                    # This is done for to fix it for the next iteration.
+                    else:
+                        if(z == z.p.left):                      # If z is on the left side of my parent
+                            z = z.p                                 # Set y to be z's uncle.                   # Case 2
+                            self.right_rotate(z)                    # Rotate right on z.                       # Case 2
+                        z.p.colour = Colour.BLACK               # Set z's parent to black.                     # Case 3
+                        z.p.p.colour = Colour.RED               # Set z's grandparent to colour to red.        # Case 3
+                        self.left_rotate(z.p.p)                 # Rotate left on z's grandparent.              # Case 3
 
         self.root.colour = Colour.BLACK
-
-
 
     def delete_key(self, z):
         print('delete key')
@@ -238,7 +239,24 @@ class RedBlackTree:
         print('check_invariants')
 
 def main():
-    word = fetch_word("board")
+    dictionary = RedBlackTree()
+    seed = "board"
+    pool = [seed]
+    #while(len(pool) > 0):
+    str = pool[0]
+    word = fetch_word(str)
+    print(word)
+        #dictionary.insert_key(word)
+        #for i in range(0, len(word.synonyms)):
+        #    add_word = word.synonyms[i].word
+         #   print(word.synonyms)
+        #    search_node = dictionary.search(add_word)
+        #    if(search_node.key != add_word):    ## => add_word was not found
+         #       pool.extend(add_word)
+
+
+
+
 
 
 ##word = input("Word -> ");
@@ -256,18 +274,53 @@ class PartOfSpeech(Enum):
     DETERMINER = 8
     EXCLAMATION = 9
 
+def pos_to_string(pos):
+    return {
+        PartOfSpeech.NOUN                       : "Noun",
+        PartOfSpeech.VERB_USED_WITHOUT_OBJECT   : "Verb (used without object)",
+        PartOfSpeech.VERB_USED_WITH_OBJECT      : "Verb (used with object)",
+        PartOfSpeech.ADJECTIVE                  : "Adjective",
+        PartOfSpeech.ADVERB                     : "Adverb",
+        PartOfSpeech.PRONOUN                    : "Pronoun",
+        PartOfSpeech.PREPOSITIONAL              : "Prepositional",
+        PartOfSpeech.CONJUNCTION                : "Conjunction",
+        PartOfSpeech.DETERMINER                 : "Determiner",
+        PartOfSpeech.EXCLAMATION                : "Exclamation"
+    }[pos]
+
 class Description:
-    context = ''
-    example = ''
+    context = []
+    example = []
 
     def __init__(self, context, example):
         self.context = context
         self.example = example
 
 class Definition:
-    number = 1                      # :: Integer || Char
+    number = 1                        # :: Integer || Char
     mainDescription = []            # :: Description
     additionalDescriptions = []     # :: [Description]
+
+    def __str__(self):
+        string = ""
+        string += str(self.number) + ". "
+
+        if(self.mainDescription != []):
+            if(self.mainDescription.context != []):
+                string += self.mainDescription.context + "\n"
+            if(self.mainDescription.example != []):
+                string += "\"" + self.mainDescription.example + "\"\n"
+
+        if(self.additionalDescriptions != []):
+            for i in range(0, len(self.additionalDescriptions)):
+                description = self.additionalDescriptions[i]
+                if(description.context != []):
+                    letter = chr(97 + i)
+                    string += "\t" + letter + ". " + description.context + "\n"
+
+                if(description.example != []):
+                    string += "\t\t\"" + description.example + "\"\n"
+        return string
 
     def __init__(self, number=0, main_description=[], additional_descriptions=[]):
         self.number = number
@@ -281,12 +334,20 @@ class Definition:
         self.additionalDescriptions = additionalDescriptions
 
 class Section:
-    partOfSpeech = ''           # :: Part of Speech
+    partOfSpeech = []           # :: Part of Speech
     definitions = []            # :: [Definition]
 
     def __init__(self, pos, definitions):
         self.partOfSpeech = pos
         self.definitions = definitions
+
+    def __str__(self):
+        out = '[' + pos_to_string(self.partOfSpeech) + ']' + '\n'
+        for i in range(0, len(self.definitions)):
+            definition = self.definitions[i]
+            print(str(definition))
+            out += str(definition)
+        return out
 
     def setPartOfSpeech(self, pos):
         self.partOfSpeech = pos
@@ -294,28 +355,77 @@ class Section:
     def setDefinitions(self, definitions):
         self.definitions = definitions
 
-class Sections:
-    sections = []
-    def __init__(self, sections=[]):
-        self.sections = sections
-
-    def addSection(self, section):
-        if(section.definitions != []):
-            self.sections.append(section)
-
 class Word:
     word = ''                   # :: String
-    sectionDefinition = []      # :: [Definition]
-    difficultyIndex = 0         # :: Integer
-    nearbyWords =   []          # :: [String]
+    sectionDefinition = []      # :: [Section]
     relatedForms = []           # :: [String]
-    canBeConfused = []          # :: [String]
-    origin = ''                 # :: String
     synonyms = []               # :: Synonyms
 
-    def __init__(self, word):
+    def __repr__(self):
+        out = "[Word]\n" + self.word + "\n"
+
+        out += "[Definition]\n"
+        for i in range(0, len(self.sectionDefinition)):
+            out += str(self.sectionDefinition[i])
+
+        out += "[Related Forms]\n"
+        row_width = 3
+        counter = 0
+        for i in range(0, len(self.relatedForms)):
+            out += str(self.relatedForms[i]) + ",\t"
+            counter += 1
+            if(counter >= row_width):
+                out += '\n'
+                counter = 0
+
+        out += "\n"
+        out += "[Synonyms]\n"
+        row_width = 3
+        counter = 0
+        for i in range(0, len(self.synonyms)):
+            out += str(self.synonyms[i]) + ",\t"
+            counter += 1
+            if(counter >= row_width):
+                out += '\n'
+                counter = 0
+        return out
+
+    def __init__(self, word, sectionDefinition, relatedForms, synonyms):
         self.word = word
-        self.sectionDefinition = []
+        self.relatedForms = relatedForms
+        self.synonyms = synonyms
+        self.sectionDefinition = sectionDefinition
+
+    def __eq__(self, other):
+        return self.word == other.word
+
+    def __gt__(self, other):
+        s_len = len(self.word)
+        o_len = len(other.word)
+        min_len = min(s_len, o_len)
+        for i in range(0, min_len):
+            cs = ord(self.word[i])
+            co = ord(other.word[i])
+            if(cs > co):
+                return True
+            elif(cs < co):
+                return False
+
+        return s_len > o_len
+
+    def __lt__(self, other):
+        s_len = len(self.word)
+        o_len = len(other.word)
+        min_len = min(s_len, o_len)
+        for i in range(0, min_len):
+            cs = ord(self.word[i])
+            co = ord(other.word[i])
+            if (cs < co):
+                return True
+            elif (cs > co):
+                return False
+
+        return s_len < o_len
 
     def addSection(self, partofspeech, section):
         if(section != []):
@@ -324,14 +434,30 @@ class Word:
 
 class Meaning:
     number = 0
-    definition = None
-    example = None
+    definition = []
+    example = []
 
     def _init__(self, definition, example):
         self.definition = definition
         self.example = example
 
+def min(a, b):
+    if(a < b):
+        return a
+    else :
+        return b
+
 def capture(text, find, clip, n=0):
+    """
+    Capture:
+        text : String
+        find : StringREGEX   - what to find in the text
+        clip : StringREGEX   - what to remove from the found text
+        n    : Int           - return setting
+                                0 is all results,
+                                1 is the first and only result not in a list,
+                                1+ is the
+    """
     input = []
     if(isinstance(text, str)):
         input = [text]
@@ -355,6 +481,8 @@ def capture(text, find, clip, n=0):
 
     if n == 0:
         return input
+    elif n == 1:
+        return input[0]
     else:
         return input[0:max(n,len(input))]
 
@@ -373,14 +501,16 @@ def clip_definition():
     regex_clip_l1 = r"<div.*number\">"
     regex_clip_l2 = r"[ ]*</span>.+?<div class=\"def-content\">[ ]*"
     regex_clip_l3 = r"[ ]*</div>"
-    regex_clip_href_a = r"<a class=\"dbox-xref dbox-roman\" href=\"http://www.dictionary.com/browse/[a-zA-Z]*\">"
+    regex_clip_href_a = r"<a class=\"dbox-xref dbox-roman\" href=\"http://www.dictionary.com/browse/[a-zA-Z-]*\">"
     regex_clip_a = r"</a>"
     regex_clip_example_href = r"[ ]*<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">"
     regex_clip_example_href_span = r"</span>"
     regex_clip_italic = r"<span class=\"dbox-italic\">"
     regex_clip_example = r"<span class=\"dbox-example\">"
     regex_clip_bold = r"<span class=\"dbox-bold\">"
+    regex_clip_bold_xref = r"<a class=\"dbox-xref dbox-bold\" href=\"http://www.dictionary.com/browse/[A-Za-z-]*\">"
     regex_clip_li = r"<li>"
+    regex_clip_lislash = r"</li>"
 
     clip = [regex_clip_new_line,
             regex_clip_carriage_return,
@@ -388,23 +518,26 @@ def clip_definition():
             regex_clip_l2,
             regex_clip_l3,
             regex_clip_href_a,
-            #regex_clip_example_href,
-            #regex_clip_example_href_span,
-            regex_clip_italic
-            ## regex_clip_example
-            ## regex_clip_bold,
-            ## regex_clip_li
-            ## regex_clip_a
+            regex_clip_example_href,
+            regex_clip_example_href_span,
+            regex_clip_italic,
+            regex_clip_example,
+            regex_clip_bold,
+            regex_clip_li,
+            regex_clip_lislash,
+            regex_clip_bold_xref,
+            regex_clip_a
     ]
 
     return clip
 
 def fetch_number(definition):
-    find = ['[0-9].']
+    find = ['[0-9]*.']
     clip = ['[.]']
     number = capture(definition, find, clip, 1)
-    number = int(number[0])
+    number = int(number)
     return number
+
 
 def fetch_main_description(dirty_definition):
     find = []
@@ -416,6 +549,8 @@ def fetch_main_description(dirty_definition):
     find = ['<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">.+?</span>']
     clip = ['<li>.+?</ol>', '</span>', '<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">']
     example = capture(dirty_definition, find, clip, 1)
+
+
     return Description(context, example)
 
 def make_sublist(descriptions):
@@ -425,8 +560,8 @@ def make_sublist(descriptions):
     find_example = ['<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">.+?</span>']
     clip_example = ['<div class=\"def-block def-inline-example\"><span class=\"dbox-example\">','</span>']
     for description in descriptions:
-        context = capture(description, find_context, clip_context)
-        example = capture(description, find_example, clip_example)
+        context = capture(description, find_context, clip_context, 1)
+        example = capture(description, find_example, clip_example, 1)
         description = Description(context, example)
         sub_list.append(description)
     return sub_list
@@ -451,16 +586,15 @@ def make_definitions(dirty_definitions):    # :: [String]
     definitions = []                        # :: [Definition]
     for dirty_definition in dirty_definitions:
         definitions.append(make_definition(dirty_definition))
+    return definitions
 
 def fetch_root(html):
-    print("-----Title-----")
     find = ["Define [a-zA-Z-]* at Dictionary.com</title>"]
     clip = ["Define ", " at Dictionary.com</title>"]
     root = capture(html, find, clip)[0]
     return root
 
 def fetch_accociated_words(html):
-    print("-----Accociated Words-----")
     find = "href=\"http://www.dictionary.com/browse/[a-zA-Z]*"
     clip = "href=\"http://www.dictionary.com/browse/"
     accociated_words = set(capture(html, find, clip))
@@ -469,79 +603,77 @@ def fetch_section(section_definitions, pos, find):
     find = find_definition(find)
     clip = clip_definition()
     pos_definition = capture(section_definitions, find, clip)
-    print(pos_definition)
+
     if(pos_definition != []):
-        definitions = make_definition(pos_definition)
+        definitions = make_definitions(pos_definition)
         return Section(pos, definitions)
     else:
         return Section(pos, [])
 
+def add_section(section, sections):
+    if(section != []):
+        sections.extend(section)
+
 def fetch_sections(html):
-    print("-----Forming Word-----")
     find = [
         "<div class=\"deep-link-synonyms\">.+?<div class=\"tail-wrapper\">.+?<div class=\"tail-box tail-type-origin pm-btn-spot\" data-pm-btn-target=\".tail-content\" >"]
     clip = []
     definition_section = capture(html, find, clip, 1)
 
-    sections = Sections()
+    sections = []
 
-    print("-----Noun Parts-----")
     find = "<span class=\"dbox-pg\">noun</span>.+?</header>.+?</section>"
     section = fetch_section(definition_section, PartOfSpeech.NOUN, find)
-    sections.addSection(section)
-    print(section.definitions)
 
-    print("-----Verbs (used without object) Parts-----")
+    if(section.definitions != []):
+        sections.append(section)
+
     find = "<span class=\"dbox-pg\">verb .used without object.+?</span>.+?</section>"
-    section = fetch_section(definition_section, PartOfSpeech.NOUN, find)
-    sections.addSection(section)
-    print(section.definitions)
+    section = fetch_section(definition_section, PartOfSpeech.VERB_USED_WITHOUT_OBJECT, find)
+    if(section.definitions != []):
+        sections.append(section)
 
-    print("-----Verbs (used with object) Parts-----")
     find = "<span class=\"dbox-pg\">verb .used with object.+?</span>.+?</section>"
-    section = fetch_section(definition_section, PartOfSpeech.NOUN, find)
-    sections.addSection(section)
-    print(section.definitions)
+    section = fetch_section(definition_section, PartOfSpeech.VERB_USED_WITH_OBJECT, find)
+    if(section.definitions != []):
+        sections.append(section)
 
     ## Adjective ##
-    print("-----Adjective-----")
     find = "<span class=\"dbox-pg\">adjective.+?</span>.+?</section>"
-    section = fetch_section(definition_section, PartOfSpeech.NOUN, find)
-    sections.addSection(section)
+    section = fetch_section(definition_section, PartOfSpeech.ADJECTIVE, find)
+    if(section.definitions != []):
+        sections.append(section)
 
     ## Adverb ##
-    print("-----Adverb-----")
     find = "<span class=\"dbox-pg\">adverb.+?</span>.+?</section>"
-    section = fetch_section(definition_section, PartOfSpeech.NOUN, find)
-    sections.addSection(section)
-    print(section.definitions)
+    section = fetch_section(definition_section, PartOfSpeech.ADVERB, find)
+    if(section.definitions != []):
+        sections.append(section)
 
     ## Pronoun ##
-    print("-----Pronoun-----")
     find = "<span class=\"dbox-pg\">pronoun.+?</span>.+?</section>"
-    section = fetch_section(definition_section, PartOfSpeech.NOUN, find)
-    sections.addSection(section)
+    section = fetch_section(definition_section, PartOfSpeech.PRONOUN, find)
+    if(section.definitions != []):
+        sections.append(section)
 
     ## Conjunction ##
-    print("-----Conjunction-----")
     find = "<span class=\"dbox-pg\">conjunction</span>.+?</section>"
-    section = fetch_section(definition_section, PartOfSpeech.NOUN, find)
-    sections.addSection(section)
-    print(section.definitions)
+    section = fetch_section(definition_section, PartOfSpeech.CONJUNCTION, find)
+    if(section.definitions != []):
+        sections.append(section)
 
     ## Determiner ##
-    print("-----Determiner-----")
-    find = "<span class=\"dbox-pg\">verb.+?.used without object.</span>.+?</section>"
-    section = fetch_section(definition_section, PartOfSpeech.NOUN, find)
-    sections.addSection(section)
-    print(section.definitions)
+    find = "<span class=\"dbox-pg\">determiner.</span>.+?</section>"
+    section = fetch_section(definition_section, PartOfSpeech.DETERMINER, find)
+    if(section.definitions != []):
+        sections.append(section)
 
     ## Exclamation ##
+    print('SECTION\n')
+    print(sections)
     return sections
 
 def fetch_related_forms(html):
-    print("-----Related Forms-----")
-
     find = ["Related forms[ ]*<button class=\"button-source\"[ ]*type=\"button\">Expand</button>.+?<div class=\"tail-header[ ]*\"[ ]*>",
             "<span class=\"dbox-bold\" data-syllable=\"[A-Za-z·]*, \">[A-Za-z]*, </span>"]
 
@@ -555,29 +687,18 @@ def fetch_synonyms(thesaurus):
     find = ['<div class=\"relevancy-block\">.+?<div id="filter-[0-9]*">','<ul>.+?</ul>']
     clip = ["\r","\n","<ul>.*<span class=\"text\">","</span>.*"]
     synonyms = capture(thesaurus, find, clip)
-    print(synonyms)
     return synonyms
 
 def make_word(dictionary, thesaurus):
-
-    word = ''                   # :: String
-    sections = []               # :: [Section]
-    relatedForms = []           # :: [String]
-    synonyms = []               # :: [String]
-
     root = fetch_root(dictionary)
-    print(root)
-
     definitions = fetch_sections(dictionary)
-    print(definitions)
-
     related_forms = fetch_related_forms(dictionary)
-    print(related_forms)
-
     synonyms = fetch_synonyms(thesaurus)
-    print(synonyms)
-    find = []
-    clip = []
+
+    word = Word(root, definitions, related_forms, synonyms)
+
+    print(word)
+    return word
 
 def fetch_word(word):
 
