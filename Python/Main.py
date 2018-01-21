@@ -1,6 +1,8 @@
 import requests
 import re
+import time
 from enum import Enum
+
 class Colour(Enum):
     RED = True
     BLACK = False
@@ -8,11 +10,13 @@ class Colour(Enum):
 class RedBlackNode:
     def __init__(self, key):
         self.key = key
-        self.colour = Colour.RED
+        self.colour = Colour.BLACK
         self.left = []
         self.right = []
         self.p = []
 
+    def __ne__(self, other):
+        return self.key != other.key
 
 class RedBlackTree:
     # Refer to Introduction to Algorithms, P 273,
@@ -39,14 +43,12 @@ class RedBlackTree:
         self.nil = RedBlackNode(key=[])
         self.root = self.nil
 
-    def search(self, key, x=[]):
-        """Iterative implementation to find a specific node in a tree."""
-        print('search')
-
-        if(x == self.nil):
+    def search(self, key, x=None):
+        """Iterative implementation to find the closest node match in the tree."""
+        if(x == None):
             x = self.root
 
-        while(x == self.nil or x.key != key):
+        while(x != self.nil and x.key != key):
             if(key > x.key):
                 x = x.right
             else:
@@ -240,24 +242,24 @@ class RedBlackTree:
 
 def main():
     dictionary = RedBlackTree()
-    seed = "board"
+    seed = "executive suite"
     pool = [seed]
-    #while(len(pool) > 0):
-    str = pool[0]
-    word = fetch_word(str)
-    print(word)
-        #dictionary.insert_key(word)
-        #for i in range(0, len(word.synonyms)):
-        #    add_word = word.synonyms[i].word
-         #   print(word.synonyms)
-        #    search_node = dictionary.search(add_word)
-        #    if(search_node.key != add_word):    ## => add_word was not found
-         #       pool.extend(add_word)
 
+    while(len(pool) > 0):
+        str = pool[0]
+        pool = pool[1:]
+        time.sleep(1)
+        word = fetch_word(str)
+        if(word != None):
+            print(word)
+            dictionary.insert_key(word)
 
-
-
-
+            for i in range(0, len(word.synonyms)):
+                add_word = word.synonyms[i]
+                search_node = dictionary.search(add_word)
+                if(search_node.key != add_word):    ## => add_word was not found
+                    pool.append(add_word)
+        print(pool)
 
 ##word = input("Word -> ");
 ##https://pythex.org/
@@ -309,7 +311,7 @@ class Definition:
             if(self.mainDescription.context != []):
                 string += self.mainDescription.context + "\n"
             if(self.mainDescription.example != []):
-                string += "\"" + self.mainDescription.example + "\"\n"
+                string += "\t\"" + self.mainDescription.example + "\"\n"
 
         if(self.additionalDescriptions != []):
             for i in range(0, len(self.additionalDescriptions)):
@@ -345,7 +347,6 @@ class Section:
         out = '[' + pos_to_string(self.partOfSpeech) + ']' + '\n'
         for i in range(0, len(self.definitions)):
             definition = self.definitions[i]
-            print(str(definition))
             out += str(definition)
         return out
 
@@ -397,35 +398,52 @@ class Word:
         self.sectionDefinition = sectionDefinition
 
     def __eq__(self, other):
-        return self.word == other.word
+        """Overrides the default implementation"""
+        if isinstance(other, str):
+            return self.word == other
+        elif isinstance(other, Word):
+            return self.word == other.word
+        return False
 
     def __gt__(self, other):
-        s_len = len(self.word)
-        o_len = len(other.word)
-        min_len = min(s_len, o_len)
-        for i in range(0, min_len):
-            cs = ord(self.word[i])
-            co = ord(other.word[i])
-            if(cs > co):
-                return True
-            elif(cs < co):
-                return False
-
-        return s_len > o_len
+        if isinstance(other, str):
+            return self.word == other
+        elif isinstance(other, Word):
+            return self.word == other.word
 
     def __lt__(self, other):
-        s_len = len(self.word)
-        o_len = len(other.word)
-        min_len = min(s_len, o_len)
-        for i in range(0, min_len):
-            cs = ord(self.word[i])
-            co = ord(other.word[i])
-            if (cs < co):
-                return True
-            elif (cs > co):
-                return False
+        if isinstance(other, str):
+            return self.word == other
+        elif isinstance(other, Word):
+            return self.word == other.word
 
-        return s_len < o_len
+    # def __gt__(self, other):
+    #     s_len = len(self.word)
+    #     o_len = len(other.word)
+    #     min_len = min(s_len, o_len)
+    #     for i in range(0, min_len):
+    #         cs = ord(self.word[i])
+    #         co = ord(other.word[i])
+    #         if(cs > co):
+    #             return True
+    #         elif(cs < co):
+    #             return False
+    #
+    #     return s_len > o_len
+    #
+    # def __lt__(self, other):
+    #     s_len = len(self.word)
+    #     o_len = len(other.word)
+    #     min_len = min(s_len, o_len)
+    #     for i in range(0, min_len):
+    #         cs = ord(self.word[i])
+    #         co = ord(other.word[i])
+    #         if (cs < co):
+    #             return True
+    #         elif (cs > co):
+    #             return False
+    #
+    #     return s_len < o_len
 
     def addSection(self, partofspeech, section):
         if(section != []):
@@ -518,13 +536,11 @@ def clip_definition():
             regex_clip_l2,
             regex_clip_l3,
             regex_clip_href_a,
-            regex_clip_example_href,
-            regex_clip_example_href_span,
+            #regex_clip_example_href,
+            #regex_clip_example_href_span,
             regex_clip_italic,
-            regex_clip_example,
+            #regex_clip_example,
             regex_clip_bold,
-            regex_clip_li,
-            regex_clip_lislash,
             regex_clip_bold_xref,
             regex_clip_a
     ]
@@ -537,7 +553,6 @@ def fetch_number(definition):
     number = capture(definition, find, clip, 1)
     number = int(number)
     return number
-
 
 def fetch_main_description(dirty_definition):
     find = []
@@ -589,9 +604,9 @@ def make_definitions(dirty_definitions):    # :: [String]
     return definitions
 
 def fetch_root(html):
-    find = ["Define [a-zA-Z-]* at Dictionary.com</title>"]
+    find = ["Define [a-zA-Z- ]* at Dictionary.com</title>"]
     clip = ["Define ", " at Dictionary.com</title>"]
-    root = capture(html, find, clip)[0]
+    root = capture(html, find, clip, 1)
     return root
 
 def fetch_accociated_words(html):
@@ -669,8 +684,7 @@ def fetch_sections(html):
         sections.append(section)
 
     ## Exclamation ##
-    print('SECTION\n')
-    print(sections)
+
     return sections
 
 def fetch_related_forms(html):
@@ -689,23 +703,52 @@ def fetch_synonyms(thesaurus):
     synonyms = capture(thesaurus, find, clip)
     return synonyms
 
+def exists_dictionary(dictionary):
+    find = ["<section class=\"closest-result\">.+?</section>"]
+    clip = []
+    cap = capture(dictionary, find, clip, 1)
+    return cap == []
+
+def exists_thesaurus(thesaurus):
+    find = ["<li id=\"words-gallery-no-results\">no thesaurus results</li>"]
+    clip = []
+    cap = capture(thesaurus, find, clip, 1)
+    return cap == []
+
 def make_word(dictionary, thesaurus):
-    root = fetch_root(dictionary)
-    definitions = fetch_sections(dictionary)
-    related_forms = fetch_related_forms(dictionary)
-    synonyms = fetch_synonyms(thesaurus)
+    root = []
+    definitions = []
+    related_forms = []
+    synonyms = []
+    if(exists_dictionary(dictionary)):
+        root = fetch_root(dictionary)
+        definitions = fetch_sections(dictionary)
+        related_forms = fetch_related_forms(dictionary)
+    else:
+        return None
+    if(exists_thesaurus(thesaurus)):
+        synonyms = fetch_synonyms(thesaurus)
 
     word = Word(root, definitions, related_forms, synonyms)
 
-    print(word)
+
     return word
 
 def fetch_word(word):
 
+    search = word.replace(" ", "-")
+
     dictionary_url = "http://www.dictionary.com/browse/" + word + "/"
     dictionary = requests.get(dictionary_url).text
+
+    print("-----DICTIONARY-----")
+    print(dictionary)
+
     thesaurus_url = "http://www.thesaurus.com/browse/" + word + "/"
     thesaurus = requests.get(thesaurus_url).text
+
+    print("-----THESAURUS-----")
+    print(thesaurus)
 
     word = make_word(dictionary, thesaurus)
 
