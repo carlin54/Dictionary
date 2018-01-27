@@ -240,9 +240,16 @@ class RedBlackTree:
     def check_invariants(self):
         print('check_invariants')
 
+def isInList(str, list):
+    for i in range(len(list)):
+        if str == list[i]:
+            return True
+    return False
+
+
 def main():
     dictionary = RedBlackTree()
-    seed = "executive suite"
+    seed = "800-pound gorilla"
     pool = [seed]
 
     while(len(pool) > 0):
@@ -251,15 +258,36 @@ def main():
         time.sleep(1)
         word = fetch_word(str)
         if(word != None):
-            print(word)
             dictionary.insert_key(word)
-
-            for i in range(0, len(word.synonyms)):
-                add_word = word.synonyms[i]
+            for i in range(0, len(word.nearbyWords)):
+                add_word = word.nearbyWords[i]
                 search_node = dictionary.search(add_word)
-                if(search_node.key != add_word):    ## => add_word was not found
-                    pool.append(add_word)
-        print(pool)
+                if (search_node.key != add_word):    ## => add_word was not found
+                    found_word = False
+                    for i in range(0, len(pool)):   ## slow
+                        if(pool[i] == add_word):
+                            found_word = True
+                            break
+
+                    if not found_word:
+                        print("Adding: " + add_word)
+                        pool.append(add_word)
+
+
+        print(word)
+
+        print("[Current Pool]")
+        row_width = 3
+        counter = 0
+        out = ''
+        for i in range(0, len(pool)):
+            out += pool[i] + ",\t"
+            counter += 1
+            if(counter >= row_width):
+                out += "\n"
+                counter = 0
+        print(out)
+
 
 ##word = input("Word -> ");
 ##https://pythex.org/
@@ -361,6 +389,7 @@ class Word:
     sectionDefinition = []      # :: [Section]
     relatedForms = []           # :: [String]
     synonyms = []               # :: Synonyms
+    nearbyWords = []            # :: [String]
 
     def __repr__(self):
         out = "[Word]\n" + self.word + "\n"
@@ -389,13 +418,23 @@ class Word:
             if(counter >= row_width):
                 out += '\n'
                 counter = 0
+
+        out += "\n"
+        out += "[Nearby Words]\n"
+        for i in range(0, len(self.nearbyWords)):
+            out += str(self.nearbyWords[i]) + ",\t"
+            counter += 1
+            if(counter >= row_width):
+                out += '\n'
+                counter = 0
         return out
 
-    def __init__(self, word, sectionDefinition, relatedForms, synonyms):
+    def __init__(self, word, section_definition, related_forms, synonyms, nearby_words):
         self.word = word
-        self.relatedForms = relatedForms
+        self.relatedForms = related_forms
         self.synonyms = synonyms
-        self.sectionDefinition = sectionDefinition
+        self.sectionDefinition = section_definition
+        self.nearbyWords = nearby_words
 
     def __eq__(self, other):
         """Overrides the default implementation"""
@@ -604,7 +643,7 @@ def make_definitions(dirty_definitions):    # :: [String]
     return definitions
 
 def fetch_root(html):
-    find = ["Define [a-zA-Z- ]* at Dictionary.com</title>"]
+    find = ["Define.+?at Dictionary.com</title>"]
     clip = ["Define ", " at Dictionary.com</title>"]
     root = capture(html, find, clip, 1)
     return root
@@ -639,7 +678,6 @@ def fetch_sections(html):
 
     find = "<span class=\"dbox-pg\">noun</span>.+?</header>.+?</section>"
     section = fetch_section(definition_section, PartOfSpeech.NOUN, find)
-
     if(section.definitions != []):
         sections.append(section)
 
@@ -685,6 +723,8 @@ def fetch_sections(html):
 
     ## Exclamation ##
 
+
+
     return sections
 
 def fetch_related_forms(html):
@@ -703,6 +743,15 @@ def fetch_synonyms(thesaurus):
     synonyms = capture(thesaurus, find, clip)
     return synonyms
 
+def fetch_nearbywords(dictionary):
+    find = ["<div class=\"nearby-words-inner-box\".+?</ul>", "<li>.+?</li>"]
+    clip = ["\n","\t","\r",
+            "<div class=\"nearby-words-inner-box\" data-linkid='lno2pu' data-ordinal='1' data-item='1'>",
+            "<li>.+?<a href=\"http://www.dictionary.com/browse/.+?\">", "[ ]*</li>",
+            "</a>"]
+    nearbyWords = capture(dictionary, find, clip)
+    return nearbyWords
+
 def exists_dictionary(dictionary):
     find = ["<section class=\"closest-result\">.+?</section>"]
     clip = []
@@ -719,36 +768,41 @@ def make_word(dictionary, thesaurus):
     root = []
     definitions = []
     related_forms = []
+    nearby_words = []
     synonyms = []
     if(exists_dictionary(dictionary)):
         root = fetch_root(dictionary)
         definitions = fetch_sections(dictionary)
         related_forms = fetch_related_forms(dictionary)
+        nearby_words = fetch_nearbywords(dictionary)
     else:
         return None
+
     if(exists_thesaurus(thesaurus)):
         synonyms = fetch_synonyms(thesaurus)
 
-    word = Word(root, definitions, related_forms, synonyms)
+    word = Word(root, definitions, related_forms, synonyms, nearby_words)
 
 
     return word
 
 def fetch_word(word):
-
-    search = word.replace(" ", "-")
+    word = word.replace("/", "--")
+    word = word.replace(" ", "-")
+    word = word.replace("&", "-and-")
 
     dictionary_url = "http://www.dictionary.com/browse/" + word + "/"
+    print("Fetching: " + dictionary_url)
     dictionary = requests.get(dictionary_url).text
 
-    print("-----DICTIONARY-----")
-    print(dictionary)
+    #print("-----DICTIONARY-----")
+    #print(dictionary)
 
     thesaurus_url = "http://www.thesaurus.com/browse/" + word + "/"
     thesaurus = requests.get(thesaurus_url).text
 
-    print("-----THESAURUS-----")
-    print(thesaurus)
+    #print("-----THESAURUS-----")
+    #print(thesaurus)
 
     word = make_word(dictionary, thesaurus)
 
