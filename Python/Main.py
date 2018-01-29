@@ -113,6 +113,7 @@ class RedBlackTree:
 
         if(y == self.nil):  # The tree was empty
             self.root = z
+            return
         elif(z.key < y.key):
             y.left = z
         else:
@@ -152,39 +153,38 @@ class RedBlackTree:
             the start of the next iteration it is black
             
         """
-        if(z.p != []):
-            while(z.p.colour == Colour.RED):                # Terminate when z's parent is black
-                if(z.p == z.p.p.left):                          # If my parent is on the left side of my grandparent
-                    y = z.p.p.right                                 # Set y to be z's uncle
-                    if(y.colour == Colour.RED):                     # If my uncle is red
-                        z.p.colour = Colour.BLACK                       # Set z's parent colour to black.       # Case 1
-                        y.colour = Colour.BLACK                         # Set z's uncle colour to black.        # Case 1
-                        z.p.p.colour = Colour.RED                       # Set z's grand parent colour to red.   # Case 1
-                        z = z.p.p                                       # Set z to z's grandparent.             # Case 1
-                                                                        # This is done for to fix it for the next iteration.
-                    else:
-                        if(z == z.p.right):                     # If z is on the right side of my parent.
-                            z = z.p                                 # Set z to be z's parent.                  # Case 2
-                            self.left_rotate(z)                     # Rotate left on z.                        # Case 2
-                        z.p.colour = Colour.BLACK               # Set z's parent to black.                     # Case 3
-                        z.p.p.colour = Colour.RED               # Set z's grandparent to colour to red.        # Case 3
-                        self.rotate_right(z.p.p)                # Rotate right on z's grandparent.             # Case 3
-
-                else:                                       # If my parent is on the right side of my grandparent.
-                    y = z.p.p.left                              # Set y to be z's uncle.
-                    if(y.colour == Colour.RED):                 # If my uncle is red.
-                        z.p.colour = Colour.BLACK                   # Set z's parent colour to black.          # Case 1
-                        y.colour = Colour.BLACK                     # Set z's uncle colour to black.           # Case 1
-                        z.p.p.colour = Colour.RED                   # Set z's grandparent colour to red.       # Case 1
-                        z = z.p.p                                   # Set z to z's grandparent.                # Case 1
+        while(z.p.colour == Colour.RED):                # Terminate when z's parent is black
+            if(z.p == z.p.p.left):                          # If my parent is on the left side of my grandparent
+                y = z.p.p.right                                 # Set y to be z's uncle
+                if(y.colour == Colour.RED):                     # If my uncle is red
+                    z.p.colour = Colour.BLACK                       # Set z's parent colour to black.       # Case 1
+                    y.colour = Colour.BLACK                         # Set z's uncle colour to black.        # Case 1
+                    z.p.p.colour = Colour.RED                       # Set z's grand parent colour to red.   # Case 1
+                    z = z.p.p                                       # Set z to z's grandparent.             # Case 1
                                                                     # This is done for to fix it for the next iteration.
-                    else:
-                        if(z == z.p.left):                      # If z is on the left side of my parent
-                            z = z.p                                 # Set y to be z's uncle.                   # Case 2
-                            self.right_rotate(z)                    # Rotate right on z.                       # Case 2
-                        z.p.colour = Colour.BLACK               # Set z's parent to black.                     # Case 3
-                        z.p.p.colour = Colour.RED               # Set z's grandparent to colour to red.        # Case 3
-                        self.left_rotate(z.p.p)                 # Rotate left on z's grandparent.              # Case 3
+                else:
+                    if(z == z.p.right):                     # If z is on the right side of my parent.
+                        z = z.p                                 # Set z to be z's parent.                  # Case 2
+                        self.left_rotate(z)                     # Rotate left on z.                        # Case 2
+                    z.p.colour = Colour.BLACK               # Set z's parent to black.                     # Case 3
+                    z.p.p.colour = Colour.RED               # Set z's grandparent to colour to red.        # Case 3
+                    self.rotate_right(z.p.p)                # Rotate right on z's grandparent.             # Case 3
+
+            else:                                       # If my parent is on the right side of my grandparent.
+                y = z.p.p.left                              # Set y to be z's uncle.
+                if(y.colour == Colour.RED):                 # If my uncle is red.
+                    z.p.colour = Colour.BLACK                   # Set z's parent colour to black.          # Case 1
+                    y.colour = Colour.BLACK                     # Set z's uncle colour to black.           # Case 1
+                    z.p.p.colour = Colour.RED                   # Set z's grandparent colour to red.       # Case 1
+                    z = z.p.p                                   # Set z to z's grandparent.                # Case 1
+                                                                # This is done for to fix it for the next iteration.
+                else:
+                    if(z == z.p.left):                      # If z is on the left side of my parent
+                        z = z.p                                 # Set y to be z's uncle.                   # Case 2
+                        self.right_rotate(z)                    # Rotate right on z.                       # Case 2
+                    z.p.colour = Colour.BLACK               # Set z's parent to black.                     # Case 3
+                    z.p.p.colour = Colour.RED               # Set z's grandparent to colour to red.        # Case 3
+                    self.left_rotate(z.p.p)                 # Rotate left on z's grandparent.              # Case 3
 
         self.root.colour = Colour.BLACK
 
@@ -248,45 +248,54 @@ def isInList(str, list):
 
 
 def main():
-    dictionary = RedBlackTree()
-    seed = "800-pound gorilla"
-    pool = [seed]
+    #dictionary = RedBlackTree()
+    #seed = "board"
+    #pool = [seed]
 
-    while(len(pool) > 0):
-        str = pool[0]
-        pool = pool[1:]
-        time.sleep(1)
-        word = fetch_word(str)
-        if(word != None):
-            dictionary.insert_key(word)
-            for i in range(0, len(word.nearbyWords)):
-                add_word = word.nearbyWords[i]
-                search_node = dictionary.search(add_word)
-                if (search_node.key != add_word):    ## => add_word was not found
-                    found_word = False
-                    for i in range(0, len(pool)):   ## slow
-                        if(pool[i] == add_word):
-                            found_word = True
-                            break
+    numbers = RedBlackTree()
 
-                    if not found_word:
-                        print("Adding: " + add_word)
-                        pool.append(add_word)
+    array = [1, 2, 3, 4, 5, 6, 7 , 8, 9, 10]
 
+    for i in range(len(array)):
+        numbers.insert_key(array[i])
 
-        print(word)
+    print('hello, world!')
 
-        print("[Current Pool]")
-        row_width = 3
-        counter = 0
-        out = ''
-        for i in range(0, len(pool)):
-            out += pool[i] + ",\t"
-            counter += 1
-            if(counter >= row_width):
-                out += "\n"
-                counter = 0
-        print(out)
+    # while(len(pool) > 0):
+    #     str = pool[0]
+    #     pool = pool[1:]
+    #     time.sleep(1)
+    #     word = fetch_word(str)
+    #     if(word != None):
+    #         dictionary.insert_key(word)
+    #         for i in range(0, len(word.nearbyWords)):
+    #             add_word = word.nearbyWords[i]
+    #             search_node = dictionary.search(add_word)
+    #             if (search_node.key != add_word):    ## => add_word was not found
+    #                 found_word = False
+    #                 for i in range(0, len(pool)):   ## slow
+    #                     if(pool[i] == add_word):
+    #                         found_word = True
+    #                         break
+    #
+    #                 if not found_word:
+    #                     print("Adding: " + add_word)
+    #                     pool.append(add_word)
+    #
+    #
+    #     print(word)
+    #
+    #     print("[Current Pool]")
+    #     row_width = 3
+    #     counter = 0
+    #     out = ''
+    #     for i in range(0, len(pool)):
+    #         out += pool[i] + ",\t"
+    #         counter += 1
+    #         if(counter >= row_width):
+    #             out += "\n"
+    #             counter = 0
+    #     print(out)
 
 
 ##word = input("Word -> ");
