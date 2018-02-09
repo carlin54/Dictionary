@@ -31,7 +31,7 @@ class RedBlackTree:
     def __init__(self):
         #Always black
         self.nil = RedBlackNode(None, None, None, None, None)
-        self.root = self.nil
+        self.root = None
 
     def add(self, value):
 
@@ -53,6 +53,7 @@ class RedBlackTree:
 
         # Clean-up
         self._rebalance(add_node)
+        self.root.colour = Colour.BLACK
 
 
     def find_node(self, value):
@@ -73,6 +74,7 @@ class RedBlackTree:
 
     def _rotate_left(self, z):
         self._update_parent(z.right, z, z.parent)
+        print("rotate_left(" + str(z.value) + ")")
         left = z.right.left
         z.parent = z.right
         z.parent.left = z
@@ -80,6 +82,7 @@ class RedBlackTree:
 
     def _rotate_right(self, z):
         self._update_parent(z.left, z, z.parent)
+        print("rotate_right(" + str(z.value) + ")")
         right = z.left.right
         z.parent = z.left
         z.parent.right = z
@@ -87,46 +90,71 @@ class RedBlackTree:
 
 
     def _rebalance(self, node):
-        print("balancing")
+        print("balancing (" + str(node.value) + ")")
+
+        parent = node.parent
 
         # 0. Z = root
-        parent = node.parent
         if not parent:  # => is Root
             node.colour = Colour.BLACK
+            print("case: 0")
             return
 
         grandparent = parent.parent
 
-        if grandparent == None:   # => Parent is Root
+        if grandparent is None:   # => Parent is Root
+            self._rebalance(node.parent)
             return
 
-        uncle = grandparent.right if parent.value < grandparent.value else grandparent.left
+
+        uncle = None if grandparent is None else \
+            (grandparent.right if parent.value < grandparent.value \
+             else grandparent.left)
 
         # 1. Z.uncle = red
-        if uncle.colour == Colour.RED:
+        if uncle is not None and uncle.colour == Colour.RED:
+            print("case: 1")
             parent.colour = Colour.BLACK
             uncle.colour = Colour.BLACK
-            grandparent = Colour.RED
-
-        # LL (left, right)
-
-        # RL (left, right)
-
-        # LR (left, right)
-
-        # RR (left, right)
+            grandparent.colour = Colour.RED
+            self._rebalance(grandparent) # this can be optimized into a while loop
 
 
         # 2. Z.uncle = black(triangle)
-        if uncle.colour == Colour.BLACK:
-            if node.value > parent.value:
-                self._rotate_left(parent)
-            else:
-                self._rotate_right(parent)
+        #
+        #       [B]                 [B]
+        #      /  \                /  \
+        #   [B]   [R] <-Rotate-> [R]  [B]
+        #        /                 \
+        #      [R]                 [R]
 
         # 3. Z.uncle = black(line)
-        if uncle.colour == Colour.BLACK
+        #
+        #       [B]    <-Rotate->   [B]
+        #      /  \                /  \
+        #   [B]   [R]            [B]  [R]
+        #  /  \                      /  \
+        #[R]  [B]                 [B]   [R]
 
+        elif uncle is None or uncle.colour == Colour.BLACK:
+            if node.value > parent.value:               # R
+                if parent.value > grandparent.value:    # RR (case 3)
+                    print("case: 3 RR")
+                    grandparent.colour = Colour.RED
+                    parent.colour = Colour.BLACK
+                    self._rotate_left(grandparent)
+                else:                                   # RL (case 2)
+                    print("case: 2 LL")
+                    self._rotate_left(node)
+            else:                                       # L
+                if parent.value > grandparent.value:    # LR (case 2)
+                    print("case: 2 LR")
+                    self._rotate_right(node)
+                else:                                   # LL (case 3)
+                    print("case: 3 LL")
+                    grandparent.colour = Colour.RED
+                    parent.colour = Colour.BLACK
+                    self._rotate_right(grandparent)
 
     def _update_parent(self, new_child, old_child, parent):
         new_child.parent = parent
@@ -137,22 +165,6 @@ class RedBlackTree:
                 parent.left = new_child
         else:
             self.root = new_child
-
-    def _rotate_right(self, child, parent, grandparent):
-        great_grandparent = grandparent.parent
-        self._update_parent(parent, grandparent, great_grandparent)
-        right = parent.right
-        parent.right = grandparent
-        grandparent.parent = parent
-        grandparent.left = right
-
-    def _rotate_left(self, child, parent, grandparent):
-        great_grandparent = grandparent.parent
-        self._update_parent(parent, grandparent, great_grandparent)
-        left = parent.left
-        parent.left = grandparent
-        grandparent.parent = parent
-        grandparent.right = left
 
     def _find_parent(self, value):
         next = self.root
@@ -176,10 +188,12 @@ class RedBlackTree:
 
 def main():
     print("testing tree")
-    array = [1,2,3,4,5,6,7,9,10]
+    array = [1,2,3,4,5,6,7,8,9,10]
     rbtree = RedBlackTree()
     for i in range(0, len(array)):
-        print("Adding: " + str(array[i]))
+        print("add(" + str(array[i]) + ")")
         rbtree.add(array[i])
+
+    print("finished")
 
 main()
