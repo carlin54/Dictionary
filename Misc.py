@@ -1,15 +1,15 @@
 
-class PartOfSpeech(Enum):
-    NOUN = 0
-    VERB_USED_WITHOUT_OBJECT = 1
-    VERB_USED_WITH_OBJECT = 2
-    ADJECTIVE = 3
-    ADVERB = 4
-    PRONOUN = 5
-    PREPOSITIONAL = 6
-    CONJUNCTION = 7
-    DETERMINER = 8
-    EXCLAMATION = 9
+# class PartOfSpeech(Enum):
+#     NOUN = 0
+#     VERB_USED_WITHOUT_OBJECT = 1
+#     VERB_USED_WITH_OBJECT = 2
+#     ADJECTIVE = 3
+#     ADVERB = 4
+#     PRONOUN = 5
+#     PREPOSITIONAL = 6
+#     CONJUNCTION = 7
+#     DETERMINER = 8
+#     EXCLAMATION = 9
 
 def pos_to_string(pos):
     return {
@@ -24,7 +24,6 @@ def pos_to_string(pos):
         PartOfSpeech.DETERMINER                 : "Determiner",
         PartOfSpeech.EXCLAMATION                : "Exclamation"
     }[pos]
-
 
 
 def min(a, b):

@@ -2,14 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="59d7e427-ce98-4a80-a130-4a78e3bff511" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Definition.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Description.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Meaning.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Misc.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Section.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Word.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Misc.py" beforeDir="false" afterPath="$PROJECT_DIR$/Misc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RedBlackTree.py" beforeDir="false" afterPath="$PROJECT_DIR$/RedBlackTree.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -24,8 +21,9 @@
     <session id="1549435133">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
+          <entry key="project.open.time.21" value="1" />
           <entry key="project.open.time.7" value="1" />
-          <entry key="project.opened" value="1" />
+          <entry key="project.opened" value="2" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -40,12 +38,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="11" />
+          <entry key="py" value="1238" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="11" />
+          <entry key="Python" value="1238" />
         </counts>
       </usages-collector>
     </session>
@@ -55,31 +53,56 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/RedBlackTree.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="15">
-              <caret line="123" column="9" selection-start-line="123" selection-start-column="9" selection-end-line="123" selection-end-column="9" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Main.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="779">
-              <caret line="294" selection-start-line="294" selection-end-line="294" />
-              <folding>
-                <element signature="e#0#15#0" expanded="true" />
-                <marker date="1541739517398" expanded="true" signature="9509:9514" ph="..." />
-                <marker date="1541739517398" expanded="true" signature="9509:10792" ph="..." />
-              </folding>
+            <state relative-caret-position="2805">
+              <caret line="187" selection-start-line="187" selection-end-line="187" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Main.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="290">
+              <caret line="306" column="52" selection-start-line="306" selection-start-column="52" selection-end-line="306" selection-end-column="52" />
+              <folding>
+                <element signature="e#0#15#0" expanded="true" />
+                <element signature="e#139#355#0" />
+                <element signature="e#381#9370#0" />
+                <element signature="e#9401#9495#0" />
+                <marker date="1541852211328" expanded="true" signature="10645:10855" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Misc.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="899">
-              <caret line="338" selection-start-line="338" selection-end-line="338" />
+            <state relative-caret-position="165">
+              <caret line="11" column="21" lean-forward="true" selection-start-line="11" selection-start-column="21" selection-end-line="11" selection-end-column="21" />
+              <folding>
+                <element signature="e#262#940#0" />
+                <element signature="e#963#1018#0" />
+                <element signature="e#1060#2075#0" />
+                <element signature="e#2103#2112#0" />
+                <element signature="e#2154#2314#0" />
+                <element signature="e#2343#3637#0" />
+                <element signature="e#3673#3801#0" />
+                <element signature="e#3853#4611#0" />
+                <element signature="e#4649#5341#0" />
+                <element signature="e#5394#5587#0" />
+                <element signature="e#5651#5927#0" />
+                <element signature="e#5991#6180#0" />
+                <element signature="e#6208#6362#0" />
+                <element signature="e#6402#6568#0" />
+                <element signature="e#6625#6913#0" />
+                <element signature="e#6955#7006#0" />
+                <element signature="e#7038#9230#0" />
+                <element signature="e#9267#9672#0" />
+                <element signature="e#9709#9924#0" />
+                <element signature="e#9965#10349#0" />
+                <element signature="e#10390#10528#0" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -141,20 +164,26 @@
       </list>
     </option>
   </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>href=&quot;/dictionary/a</find>
+      <find>href=&quot;/dictionary/</find>
+    </findStrings>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/RedBlackTree.py" />
         <option value="$PROJECT_DIR$/Word.py" />
         <option value="$PROJECT_DIR$/Meaning.py" />
         <option value="$PROJECT_DIR$/Section.py" />
         <option value="$PROJECT_DIR$/Description.py" />
         <option value="$PROJECT_DIR$/Definition.py" />
-        <option value="$PROJECT_DIR$/Main.py" />
+        <option value="$PROJECT_DIR$/RedBlackTree.py" />
         <option value="$PROJECT_DIR$/Misc.py" />
+        <option value="$PROJECT_DIR$/Main.py" />
       </list>
     </option>
   </component>
@@ -175,6 +204,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Course" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -186,7 +216,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Course" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -206,7 +235,29 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.Main">
+    <configuration name="Main" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Python" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$PROJECT_DIR$/venv/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="Red Black Tree" type="PythonConfigurationType" factoryName="Python">
       <module name="Python" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -251,6 +302,15 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Python.Red Black Tree" />
+      <item itemvalue="Python.Main" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.Main" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -266,15 +326,16 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="65" y="-4" width="1855" height="1084" extended-state="6" />
+    <frame x="64" y="-11" width="1857" height="1092" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.12281659" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12281659" />
       <window_info id="Structure" order="1" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32947367" />
-      <window_info anchor="bottom" id="Debug" order="3" visible="true" weight="0.4" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3292683" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -299,17 +360,6 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/RedBlackTree.py</url>
-          <line>192</line>
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/RedBlackTree.py</url>
-          <line>196</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
           <properties notifyOnTerminate="true" exception="BaseException">
@@ -334,8 +384,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/RedBlackTree.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="123" column="9" selection-start-line="123" selection-start-column="9" selection-end-line="123" selection-end-column="9" />
+        <state relative-caret-position="2805">
+          <caret line="187" selection-start-line="187" selection-end-line="187" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Section.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="21" selection-start-line="21" selection-end-line="21" />
         </state>
       </provider>
     </entry>
@@ -349,17 +406,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Meaning.py">
+    <entry file="file://$PROJECT_DIR$/Definition.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" selection-start-line="8" selection-end-line="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Section.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="21" selection-start-line="21" selection-end-line="21" />
+        <state relative-caret-position="555">
+          <caret line="37" selection-start-line="37" selection-end-line="37" />
         </state>
       </provider>
     </entry>
@@ -370,29 +420,54 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Definition.py">
+    <entry file="file://$PROJECT_DIR$/Meaning.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="555">
-          <caret line="37" selection-start-line="37" selection-end-line="37" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="779">
-          <caret line="294" selection-start-line="294" selection-end-line="294" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-            <marker date="1541739517398" expanded="true" signature="9509:9514" ph="..." />
-            <marker date="1541739517398" expanded="true" signature="9509:10792" ph="..." />
-          </folding>
+        <state relative-caret-position="120">
+          <caret line="8" selection-start-line="8" selection-end-line="8" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Misc.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="899">
-          <caret line="338" selection-start-line="338" selection-end-line="338" />
+        <state relative-caret-position="165">
+          <caret line="11" column="21" lean-forward="true" selection-start-line="11" selection-start-column="21" selection-end-line="11" selection-end-column="21" />
+          <folding>
+            <element signature="e#262#940#0" />
+            <element signature="e#963#1018#0" />
+            <element signature="e#1060#2075#0" />
+            <element signature="e#2103#2112#0" />
+            <element signature="e#2154#2314#0" />
+            <element signature="e#2343#3637#0" />
+            <element signature="e#3673#3801#0" />
+            <element signature="e#3853#4611#0" />
+            <element signature="e#4649#5341#0" />
+            <element signature="e#5394#5587#0" />
+            <element signature="e#5651#5927#0" />
+            <element signature="e#5991#6180#0" />
+            <element signature="e#6208#6362#0" />
+            <element signature="e#6402#6568#0" />
+            <element signature="e#6625#6913#0" />
+            <element signature="e#6955#7006#0" />
+            <element signature="e#7038#9230#0" />
+            <element signature="e#9267#9672#0" />
+            <element signature="e#9709#9924#0" />
+            <element signature="e#9965#10349#0" />
+            <element signature="e#10390#10528#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="290">
+          <caret line="306" column="52" selection-start-line="306" selection-start-column="52" selection-end-line="306" selection-end-column="52" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+            <element signature="e#139#355#0" />
+            <element signature="e#381#9370#0" />
+            <element signature="e#9401#9495#0" />
+            <marker date="1541852211328" expanded="true" signature="10645:10855" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>

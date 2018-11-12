@@ -1,6 +1,7 @@
 import requests
 import re
 import time
+
 from enum import Enum
 
 class Colour(Enum):
@@ -246,48 +247,78 @@ def isInList(str, list):
             return True
     return False
 
+def capture(text, find, clip, n=0):
+    """
+    Capture:
+        text : String
+        find : StringREGEX   - what to find in the text
+        clip : StringREGEX   - what to remove from the found text
+        n    : Int           - return setting
+                                0 is all results,
+                                1 is the first and only result not in a list,
+                                1+ is the
+    """
+    input = []
+    if(isinstance(text, str)):
+        input = [text]
+    else:
+        input = text
+
+    for i in range(0, len(find)):
+        output = []
+        for j in range(0, len(input)):
+            output.extend(re.findall(find[i], input[j], re.DOTALL))
+        input = output
+        if len(input) == 0:
+            break;
+
+    if len(input) == 0:
+        return []
+
+    for i in range(0, len(clip)):
+        for j in range(0, len(input)):
+           input[j] = re.sub(clip[i], '', input[j])
+
+    if n == 0:
+        return input
+    elif n == 1:
+        return input[0]
+    else:
+        return input[0:max(n,len(input))]
+
+def fetch_word_links_from_page(html):
+    regex_word_definition = "[A-Za-z0-9\(\) &-/ʽ;]*"
+    find = "<a href=\"/dictionary/" + regex_word_definition + "\">" + regex_word_definition + "</a>"
+    clip = ["<a href=\"/dictionary/", "</a>"]
+    captures = capture(html, find, clip)
+    print(captures)
 
 def main():
-    #dictionary = RedBlackTree()
-    #seed = "board"
-    #pool = [seed]
+    print("hello, world!")
+    seed = "word"
+    alpherbet = ["abcdefghijklmnopqrstuvwxyz0"]
+    pool = [seed]
+    word = "<a href=\"/dictionary/[A-Za-z0-9\(\) &-/ʽ;]*\">[A-Za-z0-9\(\) &-/ʽ;]*</a>"
+
+    for i in range(0, len(alpherbet)):
+        link = "https://www.merriam-webster.com/browse/dictionary/" + 'a'
+        ##Fetch Pages
+        ##page 1 of 74
+        ##<span class="counters">page 1 of 74</span>
+        for i in range(1, 10):
+            req = link + "/" + str(i)
+
+            print(req)
+            r = requests.get(req)
+            html = r.text
+            regex_word_definition = "[A-Za-z0-9\(\) &-/ʽ;]*"
+
+            find = ["<a href=\"/dictionary/[A-Za-z0-9\(\) &-/ʽ;]*\">[A-Za-z0-9\(\) &-/ʽ;]*</a>"]
+            clip = ["<a href=\"/dictionary/", "</a>"]
+            captures = capture(html, find, [])
+            print(captures)
 
 
-    # while(len(pool) > 0):
-    #     str = pool[0]
-    #     pool = pool[1:]
-    #     time.sleep(1)
-    #     word = fetch_word(str)
-    #     if(word != None):
-    #         dictionary.insert_key(word)
-    #         for i in range(0, len(word.nearbyWords)):
-    #             add_word = word.nearbyWords[i]
-    #             search_node = dictionary.search(add_word)
-    #             if (search_node.key != add_word):    ## => add_word was not found
-    #                 found_word = False
-    #                 for i in range(0, len(pool)):   ## slow
-    #                     if(pool[i] == add_word):
-    #                         found_word = True
-    #                         break
-    #
-    #                 if not found_word:
-    #                     print("Adding: " + add_word)
-    #                     pool.append(add_word)
-    #
-    #
-    #     print(word)
-    #
-    #     print("[Current Pool]")
-    #     row_width = 3
-    #     counter = 0
-    #     out = ''
-    #     for i in range(0, len(pool)):
-    #         out += pool[i] + ",\t"
-    #         counter += 1
-    #         if(counter >= row_width):
-    #             out += "\n"
-    #             counter = 0
-    #     print(out)
 
 
 ##word = input("Word -> ");
